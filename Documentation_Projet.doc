@@ -1,0 +1,60 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head><meta charset="utf-8"><title>Documentation Projet</title>
+<style>
+  body { font-family: 'Calibri', sans-serif; font-size: 12pt; line-height: 1.5; color: #000; }
+  h1 { color: #2C3E50; font-size: 24pt; border-bottom: 2px solid #3498DB; padding-bottom: 5px; text-align: center; }
+  h2 { color: #2980B9; font-size: 18pt; margin-top: 20px; }
+  h3 { color: #34495E; font-size: 14pt; }
+  ul { margin-top: 5px; }
+  li { margin-bottom: 5px; }
+  .highlight { background-color: #ecf0f1; padding: 5px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>📄 DOCUMENTATION OFFICIELLE - PROJET 4</h1>
+<p style="text-align: center;"><strong>Thème :</strong> Développement d'une API REST pour un Réseau Social</p>
+
+<h2>1. PRÉSENTATION DE L'ÉQUIPE (RÉPARTITION)</h2>
+<ul>
+  <li><strong>Zilda :</strong> Cœur du Serveur NodeJS & Authentification (Logique d'inscription et Tokens JWT).</li>
+  <li><strong>Kom :</strong> Moteur de Publications (Gestion du Fil d'actualité et requêtes d'envoi de photos/textes).</li>
+  <li><strong>Marco :</strong> Interactions Sociales & Profils (Système de "J'aime", commentaires sous les photos, affichage des profils utilisateurs).</li>
+</ul>
+
+<h2>2. ARCHITECTURE ET TECHNOLOGIES UTILISÉES</h2>
+<p>Pour mener à bien ce projet de façon professionnelle, nous avons fait le choix d'adopter une pile technologique moderne (Stack JS complet) :</p>
+
+<h3>💻 Côté Client (Frontend)</h3>
+<ul>
+  <li><strong>Next.js (React) :</strong> Framework de pointe utilisé avec le nouveau système d'App Router. Il permet une navigation ultra-rapide (Single Page Application) et une grande souplesse.</li>
+  <li><strong>Tailwind CSS v4 :</strong> L'outil utilitaire par excellence qui nous a permis de reproduire fidèlement l'intégration depuis Figma, rendant l'application adaptative (Responsive) avec un "Theme Sombre" (Dark Mode) natif.</li>
+  <li><strong>Lucide React :</strong> Bibliothèque d'icônes vectorielles légères pour les boutons d'interactions (Coeurs, Messages, Boussole...).</li>
+</ul>
+
+<h3>⚙️ Côté Serveur (Backend API REST)</h3>
+<ul>
+  <li><strong>Node.js & Express.js :</strong> Socle robuste imposé par le réseau, permettant de créer facilement notre douzaine d'Endpoints (routes API).</li>
+  <li><strong>JSON Web Tokens (JWT) :</strong> Mécanisme de sécurité utilisé pour l'authentification. Lors du login, un jeton crypté est généré et doit être transmis à chaque publication ou "J'aime" d'un membre.</li>
+  <li><strong>Bcrypt :</strong> Sécurité supplémentaire pour hacher aléatoirement les mots de passe de nos utilisateurs dans la base (ils ne sont jamais stockés en clair).</li>
+</ul>
+
+<h3>🗄️ Côté Base de Données (Database)</h3>
+<ul>
+  <li><strong>Supabase :</strong> L'alternative open-source redoutable. Nous avons délaissé le MySQL basique imposé initialement pour utiliser la base de données hyper-scalable <strong>PostgreSQL</strong> via l'infrastructure Supabase.</li>
+  <li>L'utilisation de Supabase offre une sécurité moderne à nos données et un cloud fiable, nous permettant de stocker nos 4 tables principales avec de hautes performances : 
+    <ul>
+      <li><span class="highlight">Table Users :</span> Identifiants et e-mails des étudiants.</li>
+      <li><span class="highlight">Table Posts :</span> URL des images et description des publications.</li>
+      <li><span class="highlight">Table Comments :</span> Textes des commentaires liés au Post.</li>
+      <li><span class="highlight">Table Likes :</span> Liaison entre qui a aimé quelle photo.</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>3. CONCLUSION DU DÉVELOPPEMENT</h2>
+<p>
+  Toutes les fonctionnalités décrites par le cahier des charges ont été couvertes. L'interface (Frontend) communique par des requêtes HTTP (récupération de variables au format JSON) au Backend (NodeJS), lui-même connecté à la base de données cloud Supabase pour lire ou inscrire nos informations. Le projet final regroupe plus de 12 endpoints.
+</p>
+
+</body></html>
