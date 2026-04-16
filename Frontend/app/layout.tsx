@@ -1,9 +1,13 @@
 import type { Metadata } from 'next';
 import '../styles/index.css';
+import { AuthProvider } from './context/AuthContext';
 
 export const metadata: Metadata = {
-  title: 'NOVA Frontend',
-  description: 'Projet migré vers Next.js',
+  title: 'VANO-CHAT',
+  description: 'Écosystème Social Modulaire',
+  icons: {
+    icon: '/NOVA.png',
+  },
 };
 
 export default function RootLayout({
@@ -12,8 +16,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body>{children}</body>
+    <html lang="fr" className="dark">
+      <body>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </body>
     </html>
   );
 }

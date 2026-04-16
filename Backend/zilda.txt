@@ -1,0 +1,59 @@
+📖 GUIDE DE PRÉSENTATION - PROJET VANO-CHAT (PARTIE DE ZILDA) 📖
+
+Ce document a été spécialement rédigé pour t'aider, Zilda, à comprendre et à défendre ton travail devant ton professeur. Il explique de manière simple et professionnelle chaque pièce du puzzle que tu as mise en place pour la création du Backend.
+
+---
+
+### 1. 🏗️ L'ARCHITECTURE GÉNÉRALE DU PROJET
+Ton rôle principal était de monter les fondations du serveur. Pour cela, tu as utilisé l'environnement Node.js avec le framework "Express.js", qui est le standard de l'industrie pour créer des API REST (des interfaces qui permettent au Frontend de communiquer avec la Base de données).
+
+Tu as structuré le code selon le principe "Architecture MVC modulaire" (Modèles-Vues-Contrôleurs). L'avantage ? C'est très propre et séparé :
+- "routes" : le fichier qui dit "Quelle adresse (URL) mène vers quelle fonction".
+- "controllers" : le fichier qui contient la vraie logique métier (ce qui se passe quand on appelle la route).
+- "middleware" : les vérifications intermédiaires de sécurité.
+- "config" : les réglages pour se brancher à la base de données.
+
+---
+
+### 2. 🗄️ LA BASE DE DONNÉES (Supabase / config/db.js)
+Tu as conçu une base de données relationnelle PostgreSQL (hébergée sur Supabase). 
+PostgreSQL est idéal car il est très robuste et parfait pour une application moderne en Cloud. 
+
+Dans ton code Node.js (`config/db.js`), tu as utilisé un "pool de connexions" via la bibliothèque `pg`. 
+*Pourquoi un pool ?* C'est très pertinent à justifier à ton prof : Au lieu d'ouvrir et fermer laborieusement une connexion avec Supabase à chaque fois qu'un utilisateur clique sur le site, le Pool garde des connexions ouvertes en réserve. C'est beaucoup plus performant !
+De plus, tu as sécurisé l'URL de connexion (qui contient le mot de passe de la BDD) dans un fichier caché appelé `.env`, pour ne jamais écrire de données sensibles en clair dans le code.
+
+---
+
+### 3. 🛡️ L'INSCRIPTION ET LA SÉCURITÉ (authController.js -> Fonction register)
+La sécurité était ta mission prioritaire. Lorsqu'un utilisateur s'inscrit :
+1. Tu vérifies d'abord avec une requête SQL s'il n'existe pas déjà (pour interdire les doublons). Tu utilises des requêtes préparées avec des variables (du type `$1, $2`) pour bloquer complètement les Injections SQL.
+2. Le point clé : Tu utilises la bibliothèque cryptographique `bcryptjs`.
+*A dire au prof :* "On ne sauvegarde JAMAIS un mot de passe en clair dans la base de données. Si un hacker vole la base de données, l'application est compromise. J'ai utilisé Bcrypt pour transformer le mot de passe en une chaîne de caractères indéchiffrable (un hash). Même si on vole ce hash, on ne peut pas deviner le mot de passe d'origine. J'ai également utilisé l'ajout d'un "salt", un texte aléatoire rajouté pour rendre le piratage par force brute impossible."
+
+---
+
+### 4. 🔑 LA CONNEXION ET LES SESSIONS JWT (authController.js -> Fonction login)
+Lorsque l'utilisateur se connecte, tu n'utilises pas de "Session" stockée sur ton serveur. Tu utilises un système moderne et "Stateless" (Sans état) appelé JWT (JSON Web Token) via la bibliothèque `jsonwebtoken`.
+1. Tu relies l'email à un utilisateur via notre base PostgreSQL.
+2. Tu compares son mot de passe tapé avec la version hachée grâce à `bcrypt.compare`.
+3. Si tout est bon, ton serveur génère un Badge numérique pour le client : le fameux Token JWT.
+*A dire au prof :* "Ce JWT va dire au Frontend 'ceci est un pass valide pendant 24h qui certifie cryptographiquement que c'est bien l'utilisateur N°12'. Le serveur n'a plus besoin d'utiliser sa mémoire pour se souvenir de qui est en ligne ; il lui suffit de vérifier la signature mathématique de ce badge sur la prochaine requête ! C'est ce qui rend mon API très légère et scalable (évolutive)."
+
+---
+
+### 5. 💂‍♂️ LE MIDDLEWARE (middleware/auth.js)
+Tu as créé un fichier capital : le middleware d'authentification.
+*C'est quoi un middleware ?*
+Un middleware s’exécute "au milieu", c'est-à-dire juste avant d'autoriser l'accès à une route sensible (comme supprimer un commentaire, ce qui sera codé par Marco). 
+Le middleware intercepte la requête du client, cherche le "Bearer Token" dans les en-têtes (Headers), le décrypte avec ta clé secrète, et si c'est falsifié, il renvoie une erreur "401 Unauthorized" (accès interdit). Si c'est ok, il dit `next()` ce qui permet au code de s'exécuter.
+Grâce à ce fichier, Marco et Kom n'auront plus qu'à importer ton middleware lorsqu'ils programmeront leurs routes respectives pour que leurs travaux soient 100% sécurisés.
+
+---
+
+### 6. LE POINT D'ENTRÉE (server.js)
+C'est le chef d'orchestre de ton API. Il utilise "express", défini le rôle du JSON, et autorise le trafic inter-domaines.
+Tu as pris soin d'utiliser "CORS" (Cross-Origin Resource Sharing).
+*A dire au prof :* "J'ai configuré CORS afin que notre Frontend Next.js (qui tourne sur le port 3000) ait l'autorisation d'envoyer des requêtes à notre API Backend (qui tourne sur le port 5000), sinon les navigateurs web par mesure de sécurité auraient bloqué la connexion entre les deux environnements."
+
+🌟 *Bonne chance pour l'exposé, tu maîtrises le sujet !* 🌟

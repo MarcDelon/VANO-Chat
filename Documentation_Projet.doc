@@ -20,6 +20,7 @@
   <li><strong>Zilda :</strong> Cœur du Serveur NodeJS & Authentification (Logique d'inscription et Tokens JWT).</li>
   <li><strong>Kom :</strong> Moteur de Publications (Gestion du Fil d'actualité et requêtes d'envoi de photos/textes).</li>
   <li><strong>Marco :</strong> Interactions Sociales & Profils (Système de "J'aime", commentaires sous les photos, affichage des profils utilisateurs).</li>
+  <li><strong>Nassrine :</strong> Tests & Qualité (Vérification du bon fonctionnement des routes de l'API avec Postman).</li>
 </ul>
 
 <h2>2. ARCHITECTURE ET TECHNOLOGIES UTILISÉES</h2>

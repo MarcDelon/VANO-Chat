@@ -1,86 +1,156 @@
+"use client";
+
+import { useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+import Link from 'next/link';
+
 interface SuggestionUser {
+  id: number;
   username: string;
   avatar: string;
-  subtitle: string;
+  bio: string;
 }
 
-const suggestions: SuggestionUser[] = [
-  { username: 'alex_photo', avatar: 'https://images.unsplash.com/photo-1652549752120-d9beb4c86bd4?w=150&h=150&fit=crop', subtitle: 'Followed by jane + 3 more' },
-  { username: 'sarah_art', avatar: 'https://images.unsplash.com/photo-1669206053726-bfafe8d4537f?w=150&h=150&fit=crop', subtitle: 'Followed by john_doe + 2 more' },
-  { username: 'mike_travel', avatar: 'https://images.unsplash.com/photo-1648415041078-d5b259c683be?w=150&h=150&fit=crop', subtitle: 'New to VANO chat' },
-  { username: 'emma_life', avatar: 'https://images.unsplash.com/photo-1675908910500-2dcef146f9cf?w=150&h=150&fit=crop', subtitle: 'Followed by david_fit' },
-  { username: 'chris_fit', avatar: 'https://images.unsplash.com/photo-1668834894230-d2ba3e55baa9?w=150&h=150&fit=crop', subtitle: 'Followed by sarah + 5 more' },
-];
-
 export function Suggestions() {
+  const { user, token } = useAuth();
+  const [suggestions, setSuggestions] = useState<SuggestionUser[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [followedIds, setFollowedIds] = useState<number[]>([]);
+
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (!token) return;
+      try {
+        const res = await fetch(`${API_URL}/api/users/suggestions`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setSuggestions(data);
+        }
+      } catch (error) {
+        console.error("Erreur Suggestions:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSuggestions();
+  }, [token]);
+
+  const handleFollow = async (id: number) => {
+    if (!token || followedIds.includes(id)) return;
+
+    try {
+      const res = await fetch(`${API_URL}/api/users/follow/${id}`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setFollowedIds(prev => [...prev, id]);
+        toast.success("Vous suivez maintenant cet utilisateur");
+      }
+    } catch (error) {
+      toast.error("Erreur d'abonnement");
+    }
+  };
+
   return (
     <div className="sticky top-[84px]">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-accent to-purple-600 p-[2px]">
-            <img
-              src="https://images.unsplash.com/photo-1720463671506-7da8ab4a7040?w=150&h=150&fit=crop"
-              alt="Your profile"
-              className="w-full h-full rounded-full object-cover border-2 border-card"
-            />
+          <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#333]">
+            {user?.avatar ? (
+              <img
+                src={user.avatar}
+                alt="Your profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-[#222] flex items-center justify-center text-xl font-bold text-gray-400">
+                {user?.username?.charAt(0).toUpperCase()}
+              </div>
+            )}
           </div>
           <div>
-            <div className="text-[14px] text-white">your_username</div>
-            <div className="text-[12px] text-gray-400">Your Name</div>
+            <div className="text-[14px] font-bold text-white">{user?.username}</div>
+            <div className="text-[12px] text-gray-400">{user?.username}</div>
           </div>
         </div>
-        <button className="text-[12px] text-accent hover:opacity-60 transition-opacity">
-          Switch
+        <button className="text-[12px] text-[#0095f6] font-semibold hover:text-white transition-colors">
+          Basculer
         </button>
       </div>
 
       <div className="mb-4">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-[14px] text-gray-400">Suggestions For You</span>
-          <button className="text-[12px] text-white hover:opacity-60 transition-opacity">
-            See All
+          <span className="text-[14px] font-bold text-gray-400">Suggestions pour vous</span>
+          <button className="text-[12px] font-bold text-white hover:opacity-60 transition-opacity">
+            Tout voir
           </button>
         </div>
 
         <div className="space-y-3">
-          {suggestions.map((user) => (
-            <div key={user.username} className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <img
-                  src={user.avatar}
-                  alt={user.username}
-                  className="w-8 h-8 rounded-full object-cover"
-                />
-                <div>
-                  <div className="text-[14px] text-white">{user.username}</div>
-                  <div className="text-[12px] text-gray-400">{user.subtitle}</div>
-                </div>
-              </div>
-              <button className="text-[12px] text-accent hover:opacity-60 transition-opacity">
-                Follow
-              </button>
+          {loading ? (
+            <div className="flex justify-center p-4">
+              <Loader2 className="w-5 h-5 animate-spin text-gray-600" />
             </div>
-          ))}
+          ) : suggestions.length > 0 ? (
+            suggestions.map((sugUser) => (
+              <div key={sugUser.id} className="flex items-center justify-between">
+                <Link 
+                  href={`/profile/${sugUser.id}`}
+                  className="flex items-center gap-3 group"
+                >
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-secondary">
+                    {sugUser.avatar ? (
+                      <img
+                        src={sugUser.avatar}
+                        alt={sugUser.username}
+                        className="w-full h-full object-cover group-hover:opacity-80 transition-opacity"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-[10px] text-gray-400 bg-[#222] group-hover:bg-[#333] transition-colors font-bold">
+                        {sugUser.username.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <div className="text-[14px] font-bold text-white group-hover:text-gray-300 transition-colors">{sugUser.username}</div>
+                    <div className="text-[11px] text-gray-500">Suggéré(e) pour vous</div>
+                  </div>
+                </Link>
+                <button 
+                  onClick={() => handleFollow(sugUser.id)}
+                  className={`text-[12px] font-bold transition-colors ${
+                    followedIds.includes(sugUser.id) 
+                    ? 'text-gray-500 cursor-default' 
+                    : 'text-[#0095f6] hover:text-white'
+                  }`}
+                >
+                  {followedIds.includes(sugUser.id) ? 'Suivi(e)' : 'Suivre'}
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className="text-[12px] text-gray-500 p-2">Aucune suggestion pour le moment.</div>
+          )}
         </div>
       </div>
 
-      <footer className="text-[12px] text-gray-500 space-y-2">
-        <div className="flex flex-wrap gap-2">
-          <a href="#" className="hover:underline">About</a>
-          <span>·</span>
-          <a href="#" className="hover:underline">Help</a>
-          <span>·</span>
-          <a href="#" className="hover:underline">Press</a>
-          <span>·</span>
-          <a href="#" className="hover:underline">API</a>
-          <span>·</span>
-          <a href="#" className="hover:underline">Jobs</a>
-          <span>·</span>
-          <a href="#" className="hover:underline">Privacy</a>
-          <span>·</span>
-          <a href="#" className="hover:underline">Terms</a>
+      <footer className="text-[12px] text-gray-500 space-y-2 uppercase tracking-tight mt-10">
+        <div className="flex flex-wrap gap-x-2 gap-y-1">
+          {['À propos', 'Aide', 'Presse', 'API', 'Emplois', 'Confidentialité', 'Conditions'].map(item => (
+            <span key={item} className="hover:underline cursor-pointer">{item}</span>
+          ))}
         </div>
-        <div>© 2026 VANO CHAT</div>
+        <div className="mt-4">© 2026 VANO CHAT PAR NOVA</div>
       </footer>
     </div>
   );

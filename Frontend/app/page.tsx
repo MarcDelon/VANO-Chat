@@ -1,80 +1,65 @@
 "use client";
 
-import { Header } from './components/Header';
-import { Stories } from './components/Stories';
-import { Post } from './components/Post';
-import { Suggestions } from './components/Suggestions';
-import { MessagesFloating } from './components/MessagesFloating';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
-const posts = [
-  {
-    username: 'travel_explorer',
-    avatar: 'https://images.unsplash.com/photo-1652549752120-d9beb4c86bd4?w=150&h=150&fit=crop',
-    image: 'https://images.unsplash.com/photo-1759200135367-278bd3d2a5f0?w=800&h=800&fit=crop',
-    likes: 12847,
-    caption: 'View from above 🌆✨',
-    timeAgo: '2 HOURS AGO',
-  },
-  {
-    username: 'urban_shots',
-    avatar: 'https://images.unsplash.com/photo-1669206053726-bfafe8d4537f?w=150&h=150&fit=crop',
-    image: 'https://images.unsplash.com/photo-1771605344175-d2b159281bfa?w=800&h=800&fit=crop',
-    likes: 8234,
-    caption: 'Golden hour in the city 🌇',
-    timeAgo: '5 HOURS AGO',
-  },
-  {
-    username: 'city_vibes',
-    avatar: 'https://images.unsplash.com/photo-1648415041078-d5b259c683be?w=150&h=150&fit=crop',
-    image: 'https://images.unsplash.com/photo-1764147385325-62900d196d87?w=800&h=800&fit=crop',
-    likes: 15623,
-    caption: 'Urban jungle 🏙️',
-    timeAgo: '8 HOURS AGO',
-  },
-  {
-    username: 'wanderlust_daily',
-    avatar: 'https://images.unsplash.com/photo-1675908910500-2dcef146f9cf?w=150&h=150&fit=crop',
-    image: 'https://images.unsplash.com/photo-1608817306989-3f755fcbab1b?w=800&h=800&fit=crop',
-    likes: 9876,
-    caption: 'Aerial perspectives 🚁',
-    timeAgo: '12 HOURS AGO',
-  },
-  {
-    username: 'photo_journey',
-    avatar: 'https://images.unsplash.com/photo-1668834894230-d2ba3e55baa9?w=150&h=150&fit=crop',
-    image: 'https://images.unsplash.com/photo-1774579892480-ca2a4ed30549?w=800&h=800&fit=crop',
-    likes: 11234,
-    caption: 'Nature meets architecture 🌳🏢',
-    timeAgo: '1 DAY AGO',
-  },
-];
+export default function IntroPage() {
+  const router = useRouter();
 
-export default function App() {
+  useEffect(() => {
+    // Redirige vers /login après 2.5 secondes
+    const timer = setTimeout(() => {
+      router.push('/login');
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, [router]);
+
   return (
-    <div className="min-h-screen bg-background dark">
-      <Header />
+    <div className="fixed inset-0 bg-[#0a0a0a] flex flex-col items-center justify-between overflow-hidden w-full h-full z-50">
+      
+      {/* Push the logo to the center */}
+      <div className="flex-1" />
 
-      <main className="pt-[84px] max-w-[975px] mx-auto px-5">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_319px] gap-8">
-          <div className="w-full max-w-[470px] mx-auto lg:mx-0">
-            <div className="mb-6">
-              <Stories />
-            </div>
-
-            <div>
-              {posts.map((post, index) => (
-                <Post key={index} {...post} />
-              ))}
-            </div>
-          </div>
-
-          <aside className="hidden lg:block">
-            <Suggestions />
-          </aside>
+      {/* Center Logo */}
+      <div className="flex flex-col items-center justify-center">
+        {/* Removed fixed background/borders for transparent image support */}
+        <div className="w-28 h-28 relative flex items-center justify-center">
+          <Image 
+            src="/NOVA.png" 
+            alt="NOVA Logo" 
+            fill
+            className="object-contain"
+            priority
+          />
         </div>
-      </main>
+      </div>
 
-      <MessagesFloating />
+      {/* "from NOVA" text at the bottom */}
+      <div className="flex-1 flex flex-col justify-end pb-12">
+        <div className="flex flex-col items-center">
+          <span className="text-[#8e8e8e] text-sm mb-1 font-medium">from</span>
+          <div className="flex items-center justify-center">
+            {/* Gradient text similar to the screenshot's Meta logo */}
+            <span className="bg-gradient-to-r from-[#f09433] via-[#dc2743] to-[#bc1888] text-transparent bg-clip-text font-bold text-2xl tracking-wide flex items-center">
+              <svg className="w-6 h-6 mr-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="url(#paint0_linear)"/>
+                <path d="M2 17L12 22L22 17" stroke="url(#paint0_linear)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="url(#paint0_linear)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <defs>
+                  <linearGradient id="paint0_linear" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#f09433"/>
+                    <stop offset="0.5" stopColor="#dc2743"/>
+                    <stop offset="1" stopColor="#bc1888"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              NOVA
+            </span>
+          </div>
+        </div>
+      </div>
+      
     </div>
   );
 }
