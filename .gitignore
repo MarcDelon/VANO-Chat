@@ -23,6 +23,7 @@ yarn-error.log*
 # Système
 .DS_Store
 Thumbs.db
+~$*
 
 # Rapports temporaires (on ne garde que l'Ultime)
 Rapport_Projet_VanoChat.doc
