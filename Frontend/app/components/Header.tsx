@@ -165,7 +165,7 @@ export function Header() {
           )}
         </div>
 
-        <nav className="flex items-center gap-6 relative">
+        <nav className="flex items-center gap-3 md:gap-6 relative">
           <Link href="/feed" className={`hover:opacity-60 transition-opacity ${pathname === '/feed' ? 'text-white' : 'text-gray-400'}`}>
             <Home className="w-6 h-6" />
           </Link>

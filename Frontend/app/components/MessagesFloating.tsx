@@ -211,7 +211,7 @@ export function MessagesFloating() {
   return (
     <div 
       onClick={() => setIsOpen(true)}
-      className="fixed bottom-6 right-6 z-50 flex items-center bg-[#262626] rounded-full py-2.5 px-5 shadow-2xl border border-[#333] cursor-pointer hover:bg-[#333] transition-colors gap-3 group"
+      className="hidden md:flex fixed bottom-6 right-6 z-50 items-center bg-[#262626] rounded-full py-2.5 px-5 shadow-2xl border border-[#333] cursor-pointer hover:bg-[#333] transition-colors gap-3 group"
     >
       <div className="relative flex items-center shrink-0">
         <Send className="w-6 h-6 text-white -rotate-45 mb-1 group-hover:scale-110 transition-transform" />
