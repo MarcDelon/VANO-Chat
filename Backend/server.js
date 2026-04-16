@@ -12,8 +12,11 @@ const storyRoutes = require('./routes/storyRoutes');
 const app = express();
 
 //--- Middlewares globaux ---
-// Permet de communiquer avec ton Frontend Next.js (évite les erreurs CORS)
-app.use(cors());
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 // Permet à Express de lire le corps des requêtes en JSON
 app.use(express.json());
 

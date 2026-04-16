@@ -61,6 +61,7 @@ export default function MessagesPage() {
 
   // 1. Initialiser les conversations
   useEffect(() => {
+    console.log("🔍 [VANO-CHAT] API_URL configurée :", API_URL);
     if (token) fetchConversations();
   }, [token]);
 
@@ -210,7 +211,8 @@ export default function MessagesPage() {
 
       if (res.ok) setNewMessage('');
     } catch (err) {
-      console.error("Erreur envoi:", err);
+      console.error("❌ [VANO-CHAT] Erreur envoi vers", `${API_URL}/api/messages/send`, ":", err);
+      toast.error("Échec de l'envoi. Vérifiez votre connexion ou l'URL de l'API.");
     }
   };
 
