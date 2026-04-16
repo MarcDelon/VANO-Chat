@@ -27,8 +27,13 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/stories', storyRoutes);
 
 
-// Démarrage du serveur
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Serveur en cours d'exécution sur le port ${PORT}`);
-});
+// Démarrage du serveur (uniquement en développement local)
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`🚀 Serveur en cours d'exécution sur le port ${PORT}`);
+    });
+}
+
+// Export pour Vercel
+module.exports = app;
