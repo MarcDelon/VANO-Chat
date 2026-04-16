@@ -4,7 +4,12 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase URL ou Clé Anon manquante dans les variables d\'environnement.');
+  console.warn('⚠️ Supabase URL ou Clé Anon manquante. Le client Supabase ne sera pas initialisé correctement.');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// On exporte le client uniquement si les variables sont là, sinon on exporte un objet vide ou null
+// pour éviter que Vercel ne crash pendant la phase de "prerender" (compilation).
+export const supabase = (supabaseUrl && supabaseAnonKey) 
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : {} as any; // Trick pour ne pas bloquer la compilation
+
