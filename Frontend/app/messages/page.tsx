@@ -105,7 +105,7 @@ export default function MessagesPage() {
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'messages' },
-        (payload) => {
+        (payload: any) => {
           const newMsg = payload.new as Message;
           
           // Si le message nous concerne (on est l'expéditeur ou le destinataire)
