@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Header } from '../components/Header';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
+import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { 
