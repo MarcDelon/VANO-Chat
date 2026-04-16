@@ -73,13 +73,13 @@ export default function LoginPage() {
           {/* Collage Images */}
           <div className="relative w-full h-56 flex justify-center items-center">
             <div className="absolute top-2 left-4 w-36 h-48 bg-zinc-800 rounded-3xl overflow-hidden shadow-2xl transform -rotate-12 border border-[#363636] z-10 transition-transform duration-500 hover:z-30 hover:scale-105 hover:rotate-0">
-              <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&fit=crop" alt="Friend 1" className="w-full h-full object-cover" />
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=600&fit=crop" alt="Friend 1" className="w-full h-full object-cover" />
             </div>
             <div className="absolute bottom-2 right-4 w-36 h-48 bg-zinc-800 rounded-3xl overflow-hidden shadow-2xl transform rotate-6 border border-[#363636] z-20 transition-transform duration-500 hover:scale-105 hover:rotate-0">
-              <img src="https://images.unsplash.com/photo-1506869640319-fea1a275306c?w=400&fit=crop" alt="Friend 2" className="w-full h-full object-cover" />
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop" alt="Friend 2" className="w-full h-full object-cover" />
             </div>
             <div className="absolute top-8 left-1/2 -translate-x-1/2 w-40 h-52 bg-zinc-800 rounded-3xl overflow-hidden shadow-2xl border border-[#363636] z-15 transform rotate-3 transition-transform duration-500 hover:z-30 hover:scale-105 hover:rotate-0">
-              <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&fit=crop" alt="Friend 3" className="w-full h-full object-cover" />
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=600&fit=crop" alt="Friend 3" className="w-full h-full object-cover" />
             </div>
           </div>
         </div>
