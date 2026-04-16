@@ -108,7 +108,7 @@ export function MessagesFloating() {
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'messages' },
-        (payload) => {
+        (payload: any) => {
           if (payload.new.receiver_id === user.id) {
             fetchUnreadCount();
             // Si on est dans le chat avec cet envoyeur, on ajoute le message
