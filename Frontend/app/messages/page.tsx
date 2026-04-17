@@ -214,6 +214,30 @@ export default function MessagesPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const handleSendMessage = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!newMessage.trim() || !selectedChat || !token) return;
+
+    try {
+      const res = await fetch(`${API_URL}/api/messages/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          receiverId: selectedChat.id,
+          message: newMessage.trim()
+        })
+      });
+
+      if (res.ok) setNewMessage('');
+    } catch (err) {
+      console.error("❌ [VANO-CHAT] Erreur envoi:", err);
+      toast.error("Échec de l'envoi.");
+    }
+  };
+
   const handleDeleteMessage = async (msgId: number) => {
     if (!token) return;
     try {
