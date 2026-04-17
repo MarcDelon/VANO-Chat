@@ -1,6 +1,7 @@
 import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal, X, Check } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useState } from 'react';
+import Image from 'next/image';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 
@@ -15,6 +16,7 @@ interface PostProps {
   timeAgo: string;
   isLiked?: boolean;
   isSaved?: boolean;
+  priority?: boolean;
 }
 
 export function Post({ 
@@ -27,7 +29,8 @@ export function Post({
   caption, 
   timeAgo, 
   isLiked = false,
-  isSaved = false 
+  isSaved = false,
+  priority = false
 }: PostProps) {
   const { token } = useAuth();
   const [liked, setLiked] = useState(isLiked);
@@ -209,9 +212,11 @@ export function Post({
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-purple-600 p-[2px] flex items-center justify-center overflow-hidden">
             {avatar ? (
-              <img
+            <Image
                 src={avatar}
                 alt={username}
+                width={32}
+                height={32}
                 className="w-full h-full rounded-full object-cover border-2 border-card"
               />
             ) : (
@@ -232,9 +237,11 @@ export function Post({
         whileHover={{ scale: 1.01 }}
         transition={{ duration: 0.2 }}
       >
-        <img
+        <Image
           src={image}
           alt="Post"
+          fill
+          priority={priority}
           className="w-full h-full object-cover"
         />
       </motion.div>

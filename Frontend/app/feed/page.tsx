@@ -66,7 +66,7 @@ export default function FeedPage() {
 
             <div className="space-y-4">
               {posts.length > 0 ? (
-                posts.map((post) => (
+                posts.map((post, index) => (
                   <Post 
                     key={post.id}
                     id={post.id}
@@ -79,6 +79,7 @@ export default function FeedPage() {
                     isSaved={post.isSaved || false}
                     caption={post.content || ''}
                     timeAgo={formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: fr })}
+                    priority={index < 2}
                   />
                 ))
               ) : (

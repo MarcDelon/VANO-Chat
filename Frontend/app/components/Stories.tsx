@@ -7,6 +7,7 @@ import { Loader2, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import { StoryViewer } from './StoryViewer';
+import Image from 'next/image';
 
 interface Story {
   id: number;
@@ -141,7 +142,13 @@ export function Stories() {
                   {isUploading ? (
                     <Loader2 className="w-6 h-6 animate-spin text-primary" />
                   ) : user?.avatar ? (
-                    <img src={user.avatar} className="w-full h-full object-cover" />
+                    <Image 
+                      src={user.avatar} 
+                      width={56} 
+                      height={56} 
+                      className="w-full h-full object-cover" 
+                      alt="Your avatar"
+                    />
                   ) : (
                     <span className="text-gray-400 font-bold">{user?.username?.charAt(0).toUpperCase()}</span>
                   )}
@@ -178,11 +185,13 @@ export function Stories() {
                 className="flex-shrink-0 flex flex-col items-center gap-1 group"
               >
                 <div className={`p-[2.5px] rounded-full ${story.allViewed ? 'bg-[#333]' : 'bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]'}`}>
-                  <div className="p-[3px] bg-card rounded-full border border-black/10">
-                    <img
+                  <div className="p-[3px] bg-card rounded-full border border-black/10 overflow-hidden relative w-14 h-14">
+                    <Image
                       src={story.latestMediaUrl || story.avatar || '/default-avatar.png'}
                       alt={story.username}
-                      className="w-14 h-14 rounded-full object-cover"
+                      fill
+                      sizes="56px"
+                      className="object-cover"
                     />
                   </div>
                 </div>
