@@ -1,0 +1,228 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; }
+    h1 { color: #2c3e50; border-bottom: 2px solid #2c3e50; padding-bottom: 10px; }
+    h2 { color: #2980b9; border-bottom: 1px solid #eee; margin-top: 30px; }
+    h3 { color: #16a085; }
+    table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+    th { background-color: #f8f9fa; color: #2c3e50; }
+    tr:nth-child(even) { background-color: #fcfcfc; }
+    code { background-color: #f4f4f4; padding: 2px 5px; border-radius: 3px; font-family: Consolas, monospace; }
+    .footer { font-style: italic; color: #7f8c8d; margin-top: 40px; border-top: 1px solid #eee; padding-top: 10px; }
+</style>
+</head>
+<body>
+
+<h1>📚 Documentation Technique du Backend : Vano-Chat (NOVA)</h1>
+
+<p>Ce document détaille l'architecture, la structure des fichiers et l'ensemble des points de terminaison (endpoints) de l'API NOVA. Ce projet utilise une architecture <b>MVC</b> (Modèle-Vue-Contrôleur) avec <b>Node.js</b>, <b>Express</b> et <b>Supabase</b>.</p>
+
+<hr>
+
+<h2>📂 1. Structure du Projet</h2>
+
+<h3>📁 Dossiers Principaux</h3>
+<table>
+    <tr>
+        <th>Dossier</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td><b>config/</b></td>
+        <td>Fichiers de configuration (connexion Supabase).</td>
+    </tr>
+    <tr>
+        <td><b>controllers/</b></td>
+        <td>Logique métier. Chaque fichier gère une entité (Auth, Posts, etc.).</td>
+    </tr>
+    <tr>
+        <td><b>middleware/</b></td>
+        <td>Filtres de sécurité (ex: vérification de connexion).</td>
+    </tr>
+    <tr>
+        <td><b>routes/</b></td>
+        <td>Définition des URLs et aiguillage vers les contrôleurs.</td>
+    </tr>
+</table>
+
+<h3>📄 Fichiers Racines</h3>
+<table>
+    <tr>
+        <th>Fichier</th>
+        <th>Rôle</th>
+    </tr>
+    <tr>
+        <td><b>server.js</b></td>
+        <td>Point d'entrée principal du serveur Express.</td>
+    </tr>
+    <tr>
+        <td><b>vercel.json</b></td>
+        <td>Déploiement Serverless sur Vercel.</td>
+    </tr>
+    <tr>
+        <td><b>package.json</b></td>
+        <td>Dépendances et scripts du projet.</td>
+    </tr>
+</table>
+
+<hr>
+
+<h2>🔒 2. Sécurité et Authentification</h2>
+
+<h3>Middleware : auth.js</h3>
+<p>Toutes les routes marquées comme protégées nécessitent un Header <code>Authorization</code> :</p>
+<ul>
+    <li><b>Format</b> : <code>Authorization: Bearer &lt;token_jwt&gt;</code></li>
+    <li><b>Rôle</b> : Vérifie la validité du jeton et identifie l'utilisateur.</li>
+</ul>
+
+<hr>
+
+<h2>🚀 3. Répertoire des Endpoints (API)</h2>
+
+<h3>🔑 Authentification (/auth)</h3>
+<table>
+    <tr>
+        <th>Méthode</th>
+        <th>Route</th>
+        <th>Rôle</th>
+        <th>Corps (JSON)</th>
+    </tr>
+    <tr>
+        <td><b>POST</b></td>
+        <td>/register</td>
+        <td>Créer un compte utilisateur.</td>
+        <td>{ username, email, password }</td>
+    </tr>
+    <tr>
+        <td><b>POST</b></td>
+        <td>/login</td>
+        <td>Connexion et génération du Token JWT.</td>
+        <td>{ email, password }</td>
+    </tr>
+</table>
+
+<h3>📝 Publications (/posts)</h3>
+<table>
+    <tr>
+        <th>Méthode</th>
+        <th>Route</th>
+        <th>Rôle</th>
+        <th>Auth</th>
+    </tr>
+    <tr>
+        <td><b>GET</b></td>
+        <td>/</td>
+        <td>Récupérer tous les posts.</td>
+        <td>🔒 Protégé</td>
+    </tr>
+    <tr>
+        <td><b>POST</b></td>
+        <td>/</td>
+        <td>Créer un nouveau post.</td>
+        <td>🔒 Protégé</td>
+    </tr>
+    <tr>
+        <td><b>POST</b></td>
+        <td>/like/:postId</td>
+        <td>Aimer une publication.</td>
+        <td>🔒 Protégé</td>
+    </tr>
+    <tr>
+        <td><b>POST</b></td>
+        <td>/comment/:postId</td>
+        <td>Ajouter un commentaire.</td>
+        <td>🔒 Protégé</td>
+    </tr>
+</table>
+
+<h3>👤 Utilisateurs (/users)</h3>
+<table>
+    <tr>
+        <th>Méthode</th>
+        <th>Route</th>
+        <th>Rôle</th>
+        <th>Auth</th>
+    </tr>
+    <tr>
+        <td><b>GET</b></td>
+        <td>/me</td>
+        <td>Récupérer son profil personnel.</td>
+        <td>🔒 Protégé</td>
+    </tr>
+    <tr>
+        <td><b>PUT</b></td>
+        <td>/me</td>
+        <td>Mettre à jour ses infos.</td>
+        <td>🔒 Protégé</td>
+    </tr>
+    <tr>
+        <td><b>GET</b></td>
+        <td>/search</td>
+        <td>Rechercher d'autres membres.</td>
+        <td>🔒 Protégé</td>
+    </tr>
+</table>
+
+<h3>💬 Messagerie (/messages)</h3>
+<table>
+    <tr>
+        <th>Méthode</th>
+        <th>Route</th>
+        <th>Rôle</th>
+        <th>Auth</th>
+    </tr>
+    <tr>
+        <td><b>GET</b></td>
+        <td>/conversations</td>
+        <td>Liste des discussions actives.</td>
+        <td>🔒 Protégé</td>
+    </tr>
+    <tr>
+        <td><b>POST</b></td>
+        <td>/send</td>
+        <td>Envoyer un message privé.</td>
+        <td>🔒 Protégé</td>
+    </tr>
+</table>
+
+<h3>📸 Stories (/stories)</h3>
+<table>
+    <tr>
+        <th>Méthode</th>
+        <th>Route</th>
+        <th>Rôle</th>
+        <th>Auth</th>
+    </tr>
+    <tr>
+        <td><b>GET</b></td>
+        <td>/</td>
+        <td>Récupérer les stories des amis.</td>
+        <td>🔒 Protégé</td>
+    </tr>
+    <tr>
+        <td><b>POST</b></td>
+        <td>/</td>
+        <td>Publier une nouvelle story.</td>
+        <td>🔒 Protégé</td>
+    </tr>
+</table>
+
+<hr>
+
+<h2>🛠️ 4. Flux de Données Typique</h2>
+<ol>
+    <li>Le Client (React) envoie une requête HTTP.</li>
+    <li>Le Serveur (Express) intercepte la demande.</li>
+    <li>Le Middleware vérifie le Token de sécurité.</li>
+    <li>Le Contrôleur exécute l'action avec Supabase.</li>
+    <li>Le Client reçoit le résultat en JSON.</li>
+</ol>
+
+<p class="footer">Document généré pour le projet VANO-Chat - NOVA</p>
+
+</body>
+</html>

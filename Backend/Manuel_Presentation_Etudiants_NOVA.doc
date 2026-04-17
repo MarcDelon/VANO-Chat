@@ -1,0 +1,113 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 950px; margin: auto; padding: 20px; background-color: #f4f7f6; }
+    .page-header { background: #2c3e50; color: white; padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 40px; }
+    h1 { margin: 0; font-size: 2.2em; }
+    h2 { color: #2980b9; border-bottom: 2px solid #2980b9; padding-bottom: 10px; margin-top: 50px; }
+    .endpoint-card { background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 25px; margin-bottom: 30px; border-left: 8px solid #2980b9; }
+    .method { font-weight: bold; padding: 4px 10px; border-radius: 4px; color: white; margin-right: 10px; }
+    .method-get { background: #3498db; }
+    .method-post { background: #27ae60; }
+    .method-delete { background: #e74c3c; }
+    .url { font-family: 'Consolas', monospace; font-size: 1.1em; color: #c0392b; background: #f9f9f9; padding: 5px 10px; border-radius: 5px; }
+    .label { font-weight: bold; color: #7f8c8d; min-width: 100px; display: inline-block; }
+    .value-file { color: #d35400; font-weight: bold; }
+    .value-role { color: #2c3e50; }
+    .value-mech { color: #16a085; font-style: italic; font-weight: bold; }
+    .footer { text-align: center; margin-top: 60px; color: #95a5a6; border-top: 1px solid #ddd; padding-top: 20px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+    <h1>🎓 MANUEL DE PRÉSENTATION - ÉCOSYSTÈME NOVA</h1>
+    <p>Guide pédagogique pour expliquer le fonctionnement de l'API REST aux étudiants</p>
+</div>
+
+<p>Ce document est conçu pour vous aider à expliquer <b>où</b> se trouve le code, <b>ce qu'il fait</b>, et <b>comment</b> il fonctionne techniquement.</p>
+
+<hr>
+
+<h2>🔑 PÔLE 1 : SÉCURITÉ ET ACCÈS (ZILDA)</h2>
+
+<div class="endpoint-card">
+    <p><span class="method method-post">POST</span> <span class="url">/api/auth/register</span></p>
+    <p><span class="label">Fichier :</span> <span class="value-file">Backend/routes/authRoutes.js</span> (un fichier de <b>Routeur Express</b>).</p>
+    <p><span class="label">Rôle :</span> Sert à créer un nouveau compte utilisateur sur NOVA.</p>
+    <p><span class="label">Mécanisme :</span> Cela fonctionne <span class="value-mech">grâce à la bibliothèque Bcrypt</span> qui transforme le mot de passe en un "Hash" indéchiffrable pour protéger la vie privée des membres.</p>
+</div>
+
+<div class="endpoint-card">
+    <p><span class="method method-post">POST</span> <span class="url">/api/auth/login</span></p>
+    <p><span class="label">Fichier :</span> <span class="value-file">Backend/routes/authRoutes.js</span> (un fichier de <b>Routeur Express</b>).</p>
+    <p><span class="label">Rôle :</span> Sert à identifier un utilisateur et à le garder connecté.</p>
+    <p><span class="label">Mécanisme :</span> Cela fonctionne <span class="value-mech">grâce au Token JWT (Json Web Token)</span> qui est généré par le serveur et envoyé au téléphone du client comme un "badge d'accès" numérique valide 24h.</p>
+</div>
+
+<hr>
+
+<h2>📝 PÔLE 2 : CONTENU ET PUBLICATIONS (KOM)</h2>
+
+<div class="endpoint-card">
+    <p><span class="method method-get">GET</span> <span class="url">/api/posts</span></p>
+    <p><span class="label">Fichier :</span> <span class="value-file">Backend/routes/postRoutes.js</span> (un fichier de <b>Routeur Express</b>).</p>
+    <p><span class="label">Rôle :</span> Sert à afficher toutes les photos du fil d'actualité.</p>
+    <p><span class="label">Mécanisme :</span> Cela fonctionne <span class="value-mech">grâce à une jointure SQL (Select *)</span> effectuée par le SDK Supabase, qui récupère en une seule fois les images et les pseudos de leurs auteurs.</p>
+</div>
+
+<div class="endpoint-card">
+    <p><span class="method method-post">POST</span> <span class="url">/api/posts</span></p>
+    <p><span class="label">Fichier :</span> <span class="value-file">Backend/routes/postRoutes.js</span> (un fichier de <b>Routeur Express</b>).</p>
+    <p><span class="label">Rôle :</span> Sert à publier une nouvelle photo sur le réseau.</p>
+    <p><span class="label">Mécanisme :</span> Cela fonctionne <span class="value-mech">grâce au middleware d'authentification</span> qui extrait l'ID de l'utilisateur du Token JWT pour savoir exactement quel membre est en train de poster l'image.</p>
+</div>
+
+<hr>
+
+<h2>❤️ PÔLE 3 : INTERACTIONS ET PROFILS (MARCO)</h2>
+
+<div class="endpoint-card">
+    <p><span class="method method-post">POST</span> <span class="url">/api/posts/comment/:postId</span></p>
+    <p><span class="label">Fichier :</span> <span class="value-file">Backend/routes/postRoutes.js</span> (un fichier de <b>Routeur Express</b>).</p>
+    <p><span class="label">Rôle :</span> Sert à ajouter un commentaire sous une photo spécifique.</p>
+    <p><span class="label">Mécanisme :</span> Cela fonctionne <span class="value-mech">grâce au paramètre d'URL ":postId"</span>. Le serveur utilise cet ID pour savoir exactement à quelle photo l'étudiant veut lier son nouveau commentaire dans la base de données.</p>
+</div>
+
+<div class="endpoint-card">
+    <p><span class="method method-post">POST</span> <span class="url">/api/posts/like/:postId</span></p>
+    <p><span class="label">Fichier :</span> <span class="value-file">Backend/routes/postRoutes.js</span> (un fichier de <b>Routeur Express</b>).</p>
+    <p><span class="label">Rôle :</span> Sert à ajouter un "J'aime" sur une publication.</p>
+    <p><span class="label">Mécanisme :</span> Cela fonctionne <span class="value-mech">grâce à la table de liaison "likes"</span>. Au lieu de modifier directement la photo, on ajoute une ligne qui lie "un ID Utilisateur" à "un ID Publication", ce qui permet de compter les likes facilement.</p>
+</div>
+
+<div class="endpoint-card">
+    <p><span class="method method-get">GET</span> <span class="url">/api/notifications/unread-count</span></p>
+    <p><span class="label">Fichier :</span> <span class="value-file">Backend/routes/notificationRoutes.js</span> (un fichier de <b>Routeur Express</b>).</p>
+    <p><span class="label">Rôle :</span> Sert à vérifier si l'utilisateur a de nouvelles activités non vues.</p>
+    <p><span class="label">Mécanisme :</span> Cela fonctionne <span class="value-mech">grâce au point rouge (Pulse)</span> dans le Header. Le Frontend appelle cet endpoint toutes les 30 secondes pour mettre à jour l'interface en temps réel.</p>
+</div>
+
+<div class="endpoint-card">
+    <p><span class="method method-get">GET</span> <span class="url">/api/notifications</span></p>
+    <p><span class="label">Fichier :</span> <span class="value-file">Backend/routes/notificationRoutes.js</span> (un fichier de <b>Routeur Express</b>).</p>
+    <p><span class="label">Rôle :</span> Sert à afficher la liste des personnes qui ont interagi avec vous.</p>
+    <p><span class="label">Mécanisme :</span> Cela fonctionne <span class="value-mech">grâce à la table "notifications"</span>. Lorsqu'un événement survient (ex: nouvel abonné), un enregistrement est créé. Cet endpoint récupère ces données avec les détails de l'expéditeur.</p>
+</div>
+
+<h2>🔍 OPTIMISATION MOBILE (EXPÉRIENCE UTILISATEUR)</h2>
+
+<div class="endpoint-card">
+    <p><span class="label">Fonction :</span> <b>Recherche Mobile Interactive</b></p>
+    <p><span class="label">Composant :</span> <code>Frontend/app/components/Header.tsx</code></p>
+    <p><span class="label">Rôle :</span> Permet de chercher des profils même sur petit écran via une icône dédiée.</p>
+    <p><span class="label">Mécanisme :</span> Cela fonctionne <span class="value-mech">grâce à un état React (isMobileSearchOpen)</span> qui fait apparaître une barre de recherche "expandable" uniquement quand l'étudiant clique sur la loupe.</p>
+</div>
+
+<div class="footer">
+    <p>Développé avec ❤️ par la NOVA Team (Zilda, Kom, Marco) - Projet Académique 2026</p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,175 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: auto; padding: 20px; }
+    h1 { color: #2c3e50; border-bottom: 3px solid #2980b9; padding-bottom: 15px; text-align: center; }
+    h2 { color: #2980b9; border-bottom: 2px solid #eee; margin-top: 40px; padding-bottom: 5px; }
+    h3 { color: #16a085; background: #f9f9f9; padding: 10px; border-radius: 5px; }
+    table { border-collapse: collapse; width: 100%; margin: 20px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+    th { background-color: #34495e; color: white; }
+    tr:nth-child(even) { background-color: #f2f2f2; }
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold; color: white; }
+    .badge-get { background-color: #61affe; }
+    .badge-post { background-color: #49cc90; }
+    .badge-del { background-color: #f93e3e; }
+    .badge-put { background-color: #fca130; }
+    .zilda { color: #e67e22; font-weight: bold; }
+    .kom { color: #9b59b6; font-weight: bold; }
+    .marco { color: #3498db; font-weight: bold; }
+    .definition-box { background-color: #ebf5fb; border-left: 6px solid #2980b9; padding: 20px; margin: 25px 0; }
+    .footer { font-style: italic; text-align: center; color: #95a5a6; margin-top: 50px; border-top: 1px solid #eee; padding-top: 20px; }
+</style>
+</head>
+<body>
+
+<h1>📘 RAPPORT DE PROJET : DÉVELOPPEMENT D'UNE API REST (NOVA)</h1>
+
+<p style="text-align: center; font-size: 1.2em;"><b>Cours : Architecture des API REST & Programmation Backend</b></p>
+<p style="text-align: center;"><b>Projet : Réseau Social "VANO-CHAT" (Écosystème NOVA)</b></p>
+
+<hr>
+
+<h2>👥 1. RÉPARTITION DES RESPONSABILITÉS</h2>
+<table>
+    <tr>
+        <th>Étudiant</th>
+        <th>Domaine de Responsabilité</th>
+        <th>Composants Clés</th>
+    </tr>
+    <tr>
+        <td class="zilda">ZILDA</td>
+        <td><b>Architecture & Sécurité</b></td>
+        <td>Cœur du serveur, Connexion Supabase, Middleware d'Auth, JWT, Register/Login.</td>
+    </tr>
+    <tr>
+        <td class="kom">KOM</td>
+        <td><b>Moteur de Contenu</b></td>
+        <td>Fil d'actualité, Création de publications, Galerie d'images, Stories.</td>
+    </tr>
+    <tr>
+        <td class="marco">MARCO</td>
+        <td><b>Interactions Sociales</b></td>
+        <td>Système de Likes, Commentaires, Profils utilisateurs, Recherche et Abonnements.</td>
+    </tr>
+</table>
+
+<hr>
+
+<h2>📂 2. ARCHITECTURE TECHNIQUE (RESTful)</h2>
+<div class="definition-box">
+    <b>Pourquoi ce projet est-il une API REST ?</b><br>
+    Contrairement aux sites web classiques, notre projet sépare le <b>Client</b> (React) du <b>Serveur</b> (Node.js). 
+    L'API est <b>Stateless</b> (sans état) : le serveur ne "mémorise" pas qui est connecté. Chaque requête est indépendante et contient un badge d'accès (le Token JWT) pour être identifiée.
+</div>
+
+<hr>
+
+<h2>🚀 3. CATALOGUE DÉTAILLÉ DES ENDPOINTS</h2>
+
+<p><i>Note : Toutes les routes nécessitant une authentification 🔒 vérifient le Token JWT via le middleware conçu par Zilda.</i></p>
+
+<h3>🔑 Pôle A : Authentification & Sécurité (Réalisé par <span class="zilda">Zilda</span>)</h3>
+<table>
+    <tr>
+        <th>Méthode</th>
+        <th>Endpoint</th>
+        <th>Description Détaillée</th>
+        <th>Code Statut</th>
+    </tr>
+    <tr>
+        <td><span class="badge badge-post">POST</span></td>
+        <td><code>/api/auth/register</code></td>
+        <td>Inscrit un nouvel utilisateur. Hache le mot de passe avec <b>Bcrypt</b>.</td>
+        <td>201 (Created)</td>
+    </tr>
+    <tr>
+        <td><span class="badge badge-post">POST</span></td>
+        <td><code>/api/auth/login</code></td>
+        <td>Vérifie l'identité et génère un badge numérique <b>JWT</b>.</td>
+        <td>200 (OK)</td>
+    </tr>
+</table>
+
+<h3>📝 Pôle B : Publications & Stories (Réalisé par <span class="kom">Kom</span>)</h3>
+<table>
+    <tr>
+        <th>Méthode</th>
+        <th>Endpoint</th>
+        <th>Description Détaillée</th>
+        <th>Paramètres</th>
+    </tr>
+    <tr>
+        <td><span class="badge badge-get">GET</span></td>
+        <td><code>/api/posts</code></td>
+        <td>Récupère toutes les publications (Fil d'actualité).</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td><span class="badge badge-post">POST</span></td>
+        <td><code>/api/posts</code></td>
+        <td>Permet à un utilisateur de publier une image (URL de Supabase).</td>
+        <td>image_url, content</td>
+    </tr>
+    <tr>
+        <td><span class="badge badge-get">GET</span></td>
+        <td><code>/api/stories</code></td>
+        <td>Affiche les bulles de stories actives des amis.</td>
+        <td>-</td>
+    </tr>
+</table>
+
+<h3>❤️ Pôle C : Interactions & Profils (Réalisé par <span class="marco">Marco</span>)</h3>
+<table>
+    <tr>
+        <th>Méthode</th>
+        <th>Endpoint</th>
+        <th>Description Détaillée</th>
+        <th>Code Statut</th>
+    </tr>
+    <tr>
+        <td><span class="badge badge-post">POST</span></td>
+        <td><code>/api/posts/like/:id</code></td>
+        <td>Ajoute un "J'aime" à une photo.</td>
+        <td>201 (Created)</td>
+    </tr>
+    <tr>
+        <td><span class="badge badge-post">POST</span></td>
+        <td><code>/api/posts/comment/:id</code></td>
+        <td>Enregistre un nouveau commentaire sous une photo.</td>
+        <td>201 (Created)</td>
+    </tr>
+    <tr>
+        <td><span class="badge badge-get">GET</span></td>
+        <td><code>/api/users/profile/:id</code></td>
+        <td>Affiche les données d'un membre (Profil public).</td>
+        <td>200 (OK)</td>
+    </tr>
+    <tr>
+        <td><span class="badge badge-post">POST</span></td>
+        <td><code>/api/users/follow/:id</code></td>
+        <td>Crée un lien d'abonnement entre deux utilisateurs.</td>
+        <td>200 (OK)</td>
+    </tr>
+</table>
+
+<hr>
+
+<h2>📚 4. LEXIQUE DES TERMES API REST</h2>
+<ul>
+    <li><b>Verbes HTTP</b> : Nous utilisons <code>GET</code> pour lire, <code>POST</code> pour créer, et <code>DELETE</code> pour supprimer des ressources.</li>
+    <li><b>JSON</b> : C'est le langage universel de notre API. Toutes les données circulent dans ce format léger et lisible.</li>
+    <li><b>Codes de Statut</b> : 
+        <ul>
+            <li><code>200 / 201</code> : Succès total.</li>
+            <li><code>401</code> : Échec de sécurité (Token manquant ou expiré).</li>
+            <li><code>404</code> : La ressource demandée n'existe pas.</li>
+        </ul>
+    </li>
+</ul>
+
+<p class="footer">Rapport Technique Final - NOVA Team (Zilda, Kom, Marco) - 2026</p>
+
+</body>
+</html>

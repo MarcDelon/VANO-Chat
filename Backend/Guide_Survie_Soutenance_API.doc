@@ -1,0 +1,82 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: auto; padding: 20px; }
+    h1 { color: #e74c3c; border-bottom: 3px solid #e74c3c; padding-bottom: 15px; text-align: center; }
+    h2 { color: #2c3e50; border-bottom: 2px solid #eee; margin-top: 40px; padding-bottom: 5px; }
+    .question { background-color: #fdf2f2; border-left: 5px solid #e74c3c; padding: 15px; margin: 20px 0; font-weight: bold; color: #c0392b; }
+    .answer { background-color: #f0f4f8; border-left: 5px solid #3498db; padding: 15px; margin-bottom: 30px; }
+    .keyword { color: #2980b9; font-weight: bold; text-decoration: underline; }
+    .footer { font-style: italic; text-align: center; color: #95a5a6; margin-top: 50px; border-top: 1px solid #eee; padding-top: 20px; }
+</style>
+</head>
+<body>
+
+<h1>🛡️ GUIDE DE SURVIE : QUESTIONS PIÈGES DE SOUTENANCE</h1>
+
+<p style="text-align: center; font-size: 1.1em;"><i>Ce document vous prépare aux questions les plus techniques que le jury pourrait vous poser sur votre API REST.</i></p>
+
+<hr>
+
+<h2>🔒 THÈME 1 : SÉCURITÉ & AUTHENTIFICATION</h2>
+
+<div class="question">1. Pourquoi avez-vous utilisé des Tokens JWT plutôt que des "Sessions" classiques avec Cookies sur le serveur ?</div>
+<div class="answer">
+    <b>Réponse attendue :</b> "Nous avons choisi JWT car c'est une architecture <span class="keyword">Stateless</span> (sans état). Les sessions classiques obligent le serveur à stocker chaque utilisateur en mémoire, ce qui le ralentit quand il y a des milliers de connexions. Avec le <span class="keyword">JWT</span>, le serveur ne stocke rien : il vérifie juste la signature mathématique du badge envoyé par le client. C'est plus léger, plus rapide et cela permet de faire évoluer le serveur très facilement (Scalabilité)."
+</div>
+
+<div class="question">2. Vous dites que les mots de passe sont hachés. Quelle est la différence entre "Hachage" et "Chiffrement" ?</div>
+<div class="answer">
+    <b>Réponse attendue :</b> "Le chiffrement est réversible (on peut retrouver le texte d'origine avec une clé). Le <span class="keyword">Hachage (avec Bcrypt)</span> est une fonction à sens unique. Même avec la clé du serveur, il est mathématiquement impossible de retrouver le mot de passe d'origine à partir du hash. C'est la sécurité maximale : même si notre base de données est volée, les mots de passe des utilisateurs restent illisibles."
+</div>
+
+<div class="question">3. Qu'est-ce que le "Salt" (sel) que vous utilisez dans Bcrypt ?</div>
+<div class="answer">
+    <b>Réponse attendue :</b> "C'est une chaîne de caractères aléatoire ajoutée au mot de passe avant le hachage. Cela empêche les hackers d'utiliser des 'Rainbow Tables' (dictionnaires de mots de passe déjà hachés). Grâce au <span class="keyword">Salt</span>, deux utilisateurs ayant le même mot de passe auront deux hashs totalement différents en base de données."
+</div>
+
+<hr>
+
+<h2>🌐 THÈME 2 : ARCHITECTURE REST</h2>
+
+<div class="question">4. Votre API est-elle vraiment RESTful ? Sur quels critères vous basez-vous ?</div>
+<div class="answer">
+    <b>Réponse attendue :</b> "Oui, elle respecte les principes fondamentaux du REST : 
+    1. <b>Séparation Client-Serveur</b> (Le Frontend et le Backend sont indépendants). 
+    2. <b>Utilisation des Verbes HTTP</b> (GET pour lire, POST pour créer). 
+    3. <b>Ressources Identifiables</b> par des URIs (ex: /api/posts). 
+    4. <b>Format de données Standard</b> (JSON)."
+</div>
+
+<div class="question">5. C'est quoi un Middleware ? Donnez un exemple concret dans votre projet.</div>
+<div class="answer">
+    <b>Réponse attendue :</b> "Un <span class="keyword">Middleware</span> est un script qui s'exécute 'au milieu', entre la réception de la requête et l'exécution de l'action. Dans notre projet, le middleware <code>auth.js</code> intercepte chaque demande pour vérifier si le Token JWT est valide. S'il ne l'est pas, il bloque la requête avec une erreur 401 avant même qu'elle n'arrive au contrôleur."
+</div>
+
+<hr>
+
+<h2>🗄️ THÈME 3 : GESTION DES DONNÉES</h2>
+
+<div class="question">6. Comment avez-vous protégé votre projet contre les Injections SQL ?</div>
+<div class="answer">
+    <b>Réponse attendue :</b> "Nous utilisons le SDK officiel de <span class="keyword">Supabase/PostgreSQL</span> qui utilise nativement des requêtes préparées. Les données envoyées par l'utilisateur ne sont jamais concaténées directement dans une chaîne SQL. Elles sont traitées comme des paramètres isolés, ce qui rend les injections SQL impossibles."
+</div>
+
+<div class="question">7. Pourquoi renvoyer un code 201 lors de l'inscription et un code 200 lors d'un like ?</div>
+<div class="answer">
+    <b>Réponse attendue :</b> "C'est une convention du protocole HTTP. Le code <span class="keyword">201 Created</span> signifie qu'une nouvelle ressource a été créée de façon permanente (le compte utilisateur). Le code <b>200 OK</b> est utilisé pour une action réussie qui ne crée pas forcément une entité majeure ou pour une simple lecture."
+</div>
+
+<hr>
+
+<h2>⚙️ CONSEILS DE DERNIÈRE MINUTE</h2>
+<ul>
+    <li><b>Restez Calmes</b> : Si vous ne savez pas, dites : "C'est une excellente question, dans notre implémentation actuelle nous avons privilégié la simplicité et la sécurité via JWT, mais c'est une piste d'amélioration intéressante."</li>
+    <li><b>Montrez le code</b> : Si le prof insiste, ouvrez <code>authController.js</code> et montrez la ligne avec <code>bcrypt.hash</code>. Ça prouve que vous savez où ça se passe.</li>
+</ul>
+
+<p class="footer">Document de préparation - NOVA Team - 2026</p>
+
+</body>
+</html>

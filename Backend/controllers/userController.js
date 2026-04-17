@@ -174,6 +174,15 @@ exports.followUser = async (req, res) => {
             throw error;
         }
 
+        // --- NOUVEAU : Création de la notification ---
+        await db
+            .from('notifications')
+            .insert([{
+                receiver_id: followingId,
+                sender_id: followerId,
+                type: 'follow'
+            }]);
+
         res.status(201).json({ message: 'Abonnement réussi !' });
     } catch (error) {
         console.error('Erreur followUser:', error);

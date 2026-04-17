@@ -17,6 +17,9 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
   // States pour la création de post
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -54,6 +57,58 @@ export function Header() {
 
     return () => { if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current); };
   }, [searchQuery, token]);
+
+  // Récupérer les notifications
+  useEffect(() => {
+    if (!token) return;
+
+    const fetchNotificationsData = async () => {
+      try {
+        // 1. Nombre de non-lus
+        const countRes = await fetch(`${API_URL}/api/notifications/unread-count`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (countRes.ok) {
+          const { unreadCount } = await countRes.json();
+          setUnreadNotifications(unreadCount);
+        }
+
+        // 2. Liste des notifications
+        const listRes = await fetch(`${API_URL}/api/notifications`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (listRes.ok) {
+          const data = await listRes.json();
+          setNotifications(data);
+        }
+      } catch (error) {
+        console.error("Erreur notifications:", error);
+      }
+    };
+
+    fetchNotificationsData();
+    // Rafraîchir toutes les 30 secondes
+    const interval = setInterval(fetchNotificationsData, 30000);
+    return () => clearInterval(interval);
+  }, [token, API_URL]);
+
+  const handleToggleNotifications = async () => {
+    const newState = !showNotifications;
+    setShowNotifications(newState);
+    
+    if (newState && unreadNotifications > 0) {
+      // Marquer comme lu sur le serveur
+      try {
+        await fetch(`${API_URL}/api/notifications/mark-read`, {
+          method: 'PUT',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        setUnreadNotifications(0);
+      } catch (error) {
+        console.error("Erreur mark-read:", error);
+      }
+    }
+  };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -178,8 +233,23 @@ export function Header() {
           <Link href="/explore" className={`hover:opacity-60 transition-opacity ${pathname === '/explore' ? 'text-white' : 'text-gray-400'}`}>
             <Compass className="w-6 h-6" />
           </Link>
-          <button onClick={() => setShowNotifications(!showNotifications)} className={`hover:opacity-60 transition-opacity ${showNotifications ? 'text-red-500' : 'text-white'}`}>
+
+          {/* Recherche Mobile Icon */}
+          <button 
+            onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
+            className="md:hidden hover:opacity-60 transition-opacity text-white"
+          >
+            <Search className="w-6 h-6" />
+          </button>
+
+          <button 
+            onClick={handleToggleNotifications} 
+            className={`hover:opacity-60 transition-opacity relative ${showNotifications ? 'text-red-500' : 'text-white'}`}
+          >
             <Heart className="w-6 h-6" />
+            {unreadNotifications > 0 && (
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-[#121212] animate-pulse"></span>
+            )}
           </button>
           <div className="relative">
             <button 
@@ -220,14 +290,78 @@ export function Header() {
           {/* Notifications Dropdown */}
           {showNotifications && (
             <div className="absolute top-12 -right-4 w-80 bg-[#262626] border border-[#333] rounded-xl shadow-2xl p-4 animate-in slide-in-from-top-2">
-              <h3 className="font-bold text-white mb-4">Notifications</h3>
-              <div className="flex flex-col gap-4">
-                <p className="text-sm text-gray-400 italic">Aucune nouvelle notification.</p>
+              <h3 className="font-bold text-white mb-4 border-b border-[#333] pb-2">Notifications</h3>
+              <div className="flex flex-col gap-4 max-h-[400px] overflow-y-auto custom-scrollbar">
+                {notifications.length > 0 ? (
+                  notifications.map((notif) => (
+                    <div key={notif.id} className="flex items-center gap-3 group">
+                      <div className="w-10 h-10 rounded-full overflow-hidden bg-secondary flex-shrink-0">
+                        {notif.sender?.avatar ? (
+                          <img src={notif.sender.avatar} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xs bg-secondary text-gray-400">
+                            {notif.sender?.username?.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm text-white">
+                          <span className="font-bold">{notif.sender?.username}</span> 
+                          {notif.type === 'follow' ? " s'est abonné à vous." : " a réagi à votre post."}
+                        </p>
+                        <span className="text-[10px] text-gray-500">
+                          {new Date(notif.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                      {!notif.is_read && <div className="w-2 h-2 bg-primary rounded-full"></div>}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-400 italic py-4 text-center">Aucune notification pour le moment.</p>
+                )}
               </div>
             </div>
           )}
         </nav>
       </div>
+
+      {/* Barre de Recherche Mobile (Expandable) */}
+      {isMobileSearchOpen && (
+        <div className="md:hidden bg-card border-t border-border px-5 py-3 animate-in slide-in-from-top-full">
+            <div className="flex items-center gap-3 bg-secondary rounded-lg px-4 py-2 relative">
+                <Search className="w-4 h-4 text-gray-400" />
+                <input
+                    type="text"
+                    placeholder="Chercher quelqu'un..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    autoFocus
+                    className="bg-transparent border-none outline-none text-[14px] w-full text-white placeholder:text-gray-400"
+                />
+                
+                {showSearchResults && searchResults.length > 0 && (
+                    <div className="absolute top-[120%] left-0 right-0 bg-[#262626] border border-[#333] rounded-xl shadow-2xl overflow-hidden z-[60]">
+                        {searchResults.map((resUser) => (
+                            <Link
+                                key={resUser.id}
+                                href={`/profile/${resUser.id}`}
+                                onClick={() => {
+                                    setShowSearchResults(false);
+                                    setIsMobileSearchOpen(false);
+                                }}
+                                className="flex items-center gap-3 px-4 py-3 hover:bg-[#333] transition-colors"
+                            >
+                                <div className="w-8 h-8 rounded-full overflow-hidden bg-secondary">
+                                    {resUser.avatar && <img src={resUser.avatar} className="w-full h-full object-cover" />}
+                                </div>
+                                <span className="text-sm text-white font-medium">{resUser.username}</span>
+                            </Link>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
+      )}
 
       {/* Create Post Modal */}
       {showCreateMenu && (

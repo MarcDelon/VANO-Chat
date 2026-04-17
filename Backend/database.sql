@@ -55,4 +55,15 @@ CREATE TABLE IF NOT EXISTS story_views (
     UNIQUE (user_id, story_id)
 );
 
+-- Table des Notifications
+CREATE TABLE IF NOT EXISTS notifications (
+    id SERIAL PRIMARY KEY,
+    receiver_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    sender_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    type VARCHAR(50) NOT NULL, -- 'follow', 'like', 'comment'
+    post_id INT REFERENCES posts(id) ON DELETE CASCADE,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 
