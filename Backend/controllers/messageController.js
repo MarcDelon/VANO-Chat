@@ -128,3 +128,52 @@ exports.getUnreadCount = async (req, res) => {
         res.status(500).json({ message: 'Erreur lors de la récupération du compteur.' });
     }
 };
+
+/**
+ * Modifier un message (Seulement si l'utilisateur est l'expéditeur)
+ */
+exports.updateMessage = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { id } = req.params;
+        const { message } = req.body;
+
+        const { data, error } = await db
+            .from('messages')
+            .update({ message })
+            .eq('id', id)
+            .eq('sender_id', userId) // Sécurité : Seul l'expéditeur peut modifier
+            .select();
+
+        if (error) throw error;
+        if (data.length === 0) return res.status(403).json({ message: 'Non autorisé ou message introuvable.' });
+
+        res.status(200).json(data[0]);
+    } catch (error) {
+        console.error('Erreur updateMessage:', error);
+        res.status(500).json({ message: 'Erreur lors de la modification du message.' });
+    }
+};
+
+/**
+ * Supprimer un message (Seulement si l'utilisateur est l'expéditeur)
+ */
+exports.deleteMessage = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { id } = req.params;
+
+        const { error } = await db
+            .from('messages')
+            .delete()
+            .eq('id', id)
+            .eq('sender_id', userId); // Sécurité : Seul l'expéditeur peut supprimer
+
+        if (error) throw error;
+
+        res.status(200).json({ message: 'Message supprimé.' });
+    } catch (error) {
+        console.error('Erreur deleteMessage:', error);
+        res.status(500).json({ message: 'Erreur lors de la suppression.' });
+    }
+};

@@ -1,0 +1,92 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 950px; margin: auto; padding: 20px; }
+    .header { background: #2980b9; color: white; padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 40px; }
+    h1 { margin: 0; }
+    h2 { color: #2c3e50; border-bottom: 2px solid #2980b9; padding-bottom: 10px; margin-top: 40px; }
+    .role-box { background: #ebf5fb; border-left: 6px solid #2980b9; padding: 20px; margin: 20px 0; }
+    .endpoint { background: white; border: 1px solid #ddd; border-bottom: 3px solid #ced4da; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+    .meth { font-weight: bold; padding: 3px 8px; border-radius: 3px; color: white; font-size: 0.9em; }
+    .get { background: #3498db; }
+    .post { background: #27ae60; }
+    .del { background: #e74c3c; }
+    .url { font-family: 'Consolas', monospace; color: #c0392b; font-weight: bold; }
+    .desc { margin-top: 10px; font-size: 0.95em; }
+    .tech { font-style: italic; color: #16a085; font-weight: bold; margin-top: 5px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>👤 FOCUS MEMBRE : MARCO</h1>
+    <p>Responsable des Interactions Sociales, du Profil et de la Messagerie (Chat)</p>
+</div>
+
+<div class="role-box">
+    <b>Rôle Terre à Terre :</b> Marco a construit le "pont" entre les utilisateurs. Sans lui, NOVA serait un catalogue de photos mort. Grâce à lui, on peut liker, commenter, s'abonner et surtout <b>discuter en temps réel</b>.
+</div>
+
+<h2>📂 1. PILLIER INTERACTIONS (REACTIONS)</h2>
+
+<div class="endpoint">
+    <span class="meth post">POST</span> <span class="url">/api/posts/like/:id</span>
+    <div class="desc"><b>Rôle</b> : Liker une photo.</div>
+    <div class="tech">Mécanisme : Ajoute une ligne dans la table "likes" liée à l'ID de la photo.</div>
+</div>
+
+<div class="endpoint">
+    <span class="meth post">POST</span> <span class="url">/api/posts/comment/:id</span>
+    <div class="desc"><b>Rôle</b> : Écrire un commentaire.</div>
+    <div class="tech">Mécanisme : Insère le texte dans la table "comments" avec l'ID du post.</div>
+</div>
+
+<h2>📂 2. PILLIER SOCIAL (PROFILS & AMIS)</h2>
+
+<div class="endpoint">
+    <span class="meth get">GET</span> <span class="url">/api/users/profile/:id</span>
+    <div class="desc"><b>Rôle</b> : Voir le mur d'un ami (ses photos, son nombre d'abonnés).</div>
+    <div class="tech">Mécanisme : Utilise des fonctions de comptage SQL (.select(*, {count: 'exact'})) pour les stats.</div>
+</div>
+
+<div class="endpoint">
+    <span class="meth post">POST</span> <span class="url">/api/users/follow/:id</span>
+    <div class="desc"><b>Rôle</b> : Suivre quelqu'un pour s'abonner à ses actualités.</div>
+    <div class="tech">Mécanisme : Crée une relation dans la table de pivot "followers".</div>
+</div>
+
+<h2>📂 3. PILLIER COMMUNICATION (MESSAGERIE / CHAT)</h2>
+
+<div class="endpoint">
+    <span class="meth post">POST</span> <span class="url">/api/messages/send</span>
+    <div class="desc"><b>Rôle</b> : Envoyer un message privé à un ami.</div>
+    <div class="tech">Mécanisme : Envoie le message vers Supabase avec l'ID de l'envoyeur et du receveur.</div>
+</div>
+
+<div class="endpoint">
+    <span class="meth get">GET</span> <span class="url">/api/messages/:contactId</span>
+    <div class="desc"><b>Rôle</b> : Charger toute la discussion avec un contact précis.</div>
+    <div class="tech">Mécanisme : Récupère les messages où (Moi -> Lui) OU (Lui -> Moi) classés par date.</div>
+</div>
+
+<div class="endpoint">
+    <span class="meth get">GET</span> <span class="url">/api/messages/conversations</span>
+    <div class="desc"><b>Rôle</b> : Afficher la liste de toutes les personnes avec qui j'ai déjà parlé.</div>
+    <div class="tech">Mécanisme : Filtre les messages pour ne garder que le dernier message de chaque contact.</div>
+</div>
+
+<h2>📂 4. SYSTÈME D'ALERTES (NOTIFICATIONS)</h2>
+
+<div class="endpoint">
+    <span class="meth get">GET</span> <span class="url">/api/notifications/unread-count</span>
+    <div class="desc"><b>Rôle</b> : Savoir si on a de nouvelles alertes (point rouge sur le cœur).</div>
+    <div class="tech">Mécanisme : Compte les lignes dans la table "notifications" où "is_read = false".</div>
+</div>
+
+<p style="text-align: center; margin-top: 50px; color: #95a5a6; border-top: 1px solid #ddd; padding-top: 20px;">
+    Rapport Individuel : Marco - Équipe NOVA 2026
+</p>
+
+</body>
+</html>

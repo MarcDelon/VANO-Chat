@@ -19,7 +19,10 @@ import {
   ChevronLeft,
   Loader2,
   Plus,
-  X
+  X,
+  Trash2,
+  Edit2,
+  CornerUpLeft
 } from 'lucide-react';
 
 interface Conversation {
@@ -57,6 +60,12 @@ export default function MessagesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loadingFriends, setLoadingFriends] = useState(false);
   const [convSearchQuery, setConvSearchQuery] = useState('');
+  
+  // États pour l'édition et suppression
+  const [editingMessage, setEditingMessage] = useState<Message | null>(null);
+  const [editValue, setEditValue] = useState('');
+  const [mobileMenuMsg, setMobileMenuMsg] = useState<Message | null>(null);
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -109,18 +118,30 @@ export default function MessagesPage() {
         { event: 'INSERT', schema: 'public', table: 'messages' },
         (payload: any) => {
           const newMsg = payload.new as Message;
-          
-          // Si le message nous concerne (on est l'expéditeur ou le destinataire)
           if (newMsg.sender_id === user.id || newMsg.receiver_id === user.id) {
-            
-            // Si on est dans la conversation ouverte avec cet utilisateur
             if (selectedChat && (newMsg.sender_id === selectedChat.id || newMsg.receiver_id === selectedChat.id)) {
-                setMessages(prev => [...prev, newMsg]);
+                setMessages(prev => [...prev.filter(m => m.id !== newMsg.id), newMsg]);
             }
-            
-            // Rafraîchir la liste des conversations pour mettre à jour le "dernier message"
             fetchConversations();
           }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'messages' },
+        (payload: any) => {
+          const updatedMsg = payload.new as Message;
+          setMessages(prev => prev.map(m => m.id === updatedMsg.id ? updatedMsg : m));
+          fetchConversations();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'messages' },
+        (payload: any) => {
+          const deletedId = payload.old.id;
+          setMessages(prev => prev.filter(m => m.id !== deletedId));
+          fetchConversations();
         }
       )
       .subscribe();
@@ -193,27 +214,59 @@ export default function MessagesPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSendMessage = async (e?: React.FormEvent) => {
+  const handleDeleteMessage = async (msgId: number) => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_URL}/api/messages/${msgId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setMessages(prev => prev.filter(m => m.id !== msgId));
+        toast.success("Message supprimé");
+      }
+    } catch (err) {
+      console.error("Erreur delete:", err);
+    }
+    setMobileMenuMsg(null);
+  };
+
+  const handleUpdateMessage = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (!newMessage.trim() || !selectedChat || !token) return;
+    if (!editingMessage || !editValue.trim() || !token) return;
 
     try {
-      const res = await fetch(`${API_URL}/api/messages/send`, {
-        method: 'POST',
+      const res = await fetch(`${API_URL}/api/messages/${editingMessage.id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          receiverId: selectedChat.id,
-          message: newMessage.trim()
-        })
+        body: JSON.stringify({ message: editValue.trim() })
       });
 
-      if (res.ok) setNewMessage('');
+      if (res.ok) {
+        setMessages(prev => prev.map(m => m.id === editingMessage.id ? { ...m, message: editValue.trim() } : m));
+        setEditingMessage(null);
+        setEditValue('');
+        toast.success("Message modifié");
+      }
     } catch (err) {
-      console.error("❌ [VANO-CHAT] Erreur envoi vers", `${API_URL}/api/messages/send`, ":", err);
-      toast.error("Échec de l'envoi. Vérifiez votre connexion ou l'URL de l'API.");
+      console.error("Erreur update:", err);
+    }
+  };
+
+  const startLongPress = (msg: Message) => {
+    if (msg.sender_id !== user?.id) return;
+    longPressTimer.current = setTimeout(() => {
+      setMobileMenuMsg(msg);
+    }, 500);
+  };
+
+  const stopLongPress = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
     }
   };
 
@@ -330,17 +383,42 @@ export default function MessagesPage() {
                 ) : (
                     messages.map((msg) => (
                     <div key={msg.id} className={`flex ${msg.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[70%] group relative`}>
-                        <div className={`px-4 py-2.5 rounded-2xl text-[15px] leading-relaxed shadow-sm ${
-                            msg.sender_id === user?.id 
-                            ? 'bg-blue-600 text-white rounded-tr-none' 
-                            : 'bg-[#1a1a1a] text-gray-100 rounded-tl-none border border-[#262626]'
-                        }`}>
-                            {msg.message}
-                        </div>
-                        <span className={`text-[10px] text-gray-500 mt-1 block font-medium ${msg.sender_id === user?.id ? 'text-right' : 'text-left'}`}>
-                            {format(new Date(msg.created_at), 'HH:mm')}
-                        </span>
+                        <div 
+                          className={`max-w-[70%] group relative`}
+                          onTouchStart={() => startLongPress(msg)}
+                          onTouchEnd={stopLongPress}
+                          onMouseDown={() => startLongPress(msg)}
+                          onMouseUp={stopLongPress}
+                          onMouseLeave={stopLongPress}
+                        >
+                          {/* Desktop Actions (Hover) */}
+                          {msg.sender_id === user?.id && (
+                            <div className="absolute -left-12 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center gap-1">
+                              <button 
+                                onClick={() => { setEditingMessage(msg); setEditValue(msg.message); }}
+                                className="p-1.5 hover:bg-[#1a1a1a] rounded-full text-gray-500 hover:text-blue-500 transition-colors"
+                              >
+                                <Edit2 size={14} />
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteMessage(msg.id)}
+                                className="p-1.5 hover:bg-[#1a1a1a] rounded-full text-gray-500 hover:text-red-500 transition-colors"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          )}
+
+                          <div className={`px-4 py-2.5 rounded-2xl text-[15px] leading-relaxed shadow-sm transition-all active:scale-[0.98] ${
+                              msg.sender_id === user?.id 
+                              ? 'bg-blue-600 text-white rounded-tr-none' 
+                              : 'bg-[#1a1a1a] text-gray-100 rounded-tl-none border border-[#262626]'
+                          }`}>
+                              {msg.message}
+                          </div>
+                          <span className={`text-[10px] text-gray-500 mt-1 block font-medium ${msg.sender_id === user?.id ? 'text-right' : 'text-left'}`}>
+                              {format(new Date(msg.created_at), 'HH:mm')}
+                          </span>
                         </div>
                     </div>
                     ))
@@ -348,33 +426,52 @@ export default function MessagesPage() {
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Chat Input */}
-              <form onSubmit={handleSendMessage} className="p-4 px-6 border-t border-[#262626] bg-black">
+              {/* Chat Input / Edit Mode */}
+              <form onSubmit={editingMessage ? handleUpdateMessage : handleSendMessage} className="p-4 px-6 border-t border-[#262626] bg-black">
+                {editingMessage && (
+                  <div className="flex items-center justify-between mb-2 px-2 bg-blue-600/10 py-1.5 rounded-lg border border-blue-600/20">
+                    <div className="flex items-center gap-2 text-blue-500 text-[12px] font-bold">
+                       <CornerUpLeft size={14} />
+                       Modification en cours
+                    </div>
+                    <button onClick={() => { setEditingMessage(null); setEditValue(''); }} className="text-gray-500 hover:text-white">
+                      <X size={14} />
+                    </button>
+                  </div>
+                )}
                 <div className="flex items-center gap-4 bg-[#121212] border border-[#262626] rounded-2xl px-4 py-2 focus-within:border-gray-600 transition-all">
                   <button type="button" className="text-gray-400 hover:text-white transition-colors">
                     <Smile size={22} />
                   </button>
                   <input 
                     type="text" 
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder="Envoyer un message..." 
+                    value={editingMessage ? editValue : newMessage}
+                    onChange={(e) => editingMessage ? setEditValue(e.target.value) : setNewMessage(e.target.value)}
+                    placeholder={editingMessage ? "Modifier le message..." : "Envoyer un message..."} 
                     className="bg-transparent border-none outline-none text-[15px] flex-1 py-1 text-white placeholder:text-gray-600"
                   />
                   <div className="flex items-center gap-3">
-                    {!newMessage ? (
-                      <>
-                        <button type="button" className="text-gray-400 hover:text-white transition-colors">
-                          <ImageIcon size={22} />
-                        </button>
-                        <button type="button" className="text-gray-400 hover:text-white transition-colors">
-                          <Send size={22} className="-rotate-45" />
-                        </button>
-                      </>
-                    ) : (
+                    {editingMessage ? (
                       <button type="submit" className="text-blue-500 font-bold text-[15px] hover:text-blue-400 transition-colors uppercase tracking-tight pr-1">
-                        Envoyer
+                        Enregistrer
                       </button>
+                    ) : (
+                      <>
+                        {!newMessage ? (
+                          <>
+                            <button type="button" className="text-gray-400 hover:text-white transition-colors">
+                              <ImageIcon size={22} />
+                            </button>
+                            <button type="button" className="text-gray-400 hover:text-white transition-colors">
+                              <Send size={22} className="-rotate-45" />
+                            </button>
+                          </>
+                        ) : (
+                          <button type="submit" className="text-blue-500 font-bold text-[15px] hover:text-blue-400 transition-colors uppercase tracking-tight pr-1">
+                            Envoyer
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
@@ -459,6 +556,33 @@ export default function MessagesPage() {
                 </>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MOBILE OPTIONS MODAL (LONG PRESS) */}
+      {mobileMenuMsg && (
+        <div className="fixed inset-0 z-[100] flex flex-col justify-end bg-black/60 backdrop-blur-sm" onClick={() => setMobileMenuMsg(null)}>
+          <div className="bg-[#121212] w-full rounded-t-3xl border-t border-[#262626] p-6 pb-10 animate-in slide-in-from-bottom-full" onClick={e => e.stopPropagation()}>
+             <div className="w-12 h-1.5 bg-[#262626] rounded-full mx-auto mb-6"></div>
+             <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-4 px-2">Options du message</p>
+             <div className="space-y-2">
+                <button 
+                  onClick={() => { setEditingMessage(mobileMenuMsg); setEditValue(mobileMenuMsg.message); setMobileMenuMsg(null); }}
+                  className="w-full flex items-center gap-4 p-4 hover:bg-[#1a1a1a] rounded-2xl transition-colors text-white font-semibold"
+                >
+                   <div className="w-10 h-10 bg-blue-600/10 rounded-full flex items-center justify-center text-blue-500"><Edit2 size={18} /></div>
+                   Modifier le message
+                </button>
+                <button 
+                  onClick={() => handleDeleteMessage(mobileMenuMsg.id)}
+                  className="w-full flex items-center gap-4 p-4 hover:bg-[#1a1a1a] rounded-2xl transition-colors text-red-500 font-semibold"
+                >
+                   <div className="w-10 h-10 bg-red-600/10 rounded-full flex items-center justify-center text-red-500"><Trash2 size={18} /></div>
+                   Supprimer pour tout le monde
+                </button>
+             </div>
+             <button onClick={() => setMobileMenuMsg(null)} className="w-full mt-4 p-4 text-gray-400 font-medium">Annuler</button>
           </div>
         </div>
       )}

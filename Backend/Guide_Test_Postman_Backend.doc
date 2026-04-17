@@ -1,0 +1,99 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: auto; padding: 20px; }
+    h1 { color: #e67e22; border-bottom: 3px solid #e67e22; padding-bottom: 10px; text-align: center; }
+    h2 { color: #2980b9; border-bottom: 2px solid #eee; margin-top: 30px; }
+    .step-box { background-color: #fcfcfc; border: 1px solid #ddd; padding: 15px; border-left: 5px solid #27ae60; margin: 15px 0; }
+    pre { background-color: #2c3e50; color: #ecf0f1; padding: 10px; border-radius: 5px; font-size: 0.9em; }
+    .info { background-color: #ecf0f1; padding: 10px; border-radius: 5px; margin-top: 20px; font-style: italic; }
+</style>
+</head>
+<body>
+
+<h1>🚀 GUIDE DE TEST : NOA BACKEND VIA POSTMAN</h1>
+
+<p>Ce guide vous explique comment valider techniquement chaque endpoint de votre API REST "Vano-Chat" devant votre jury.</p>
+
+<hr>
+
+<h2>🛠️ 1. PRÉPARATION</h2>
+<ul>
+    <li><b>Base URL</b> : <code>https://vano-chat-api.vercel.app/api</code></li>
+    <li><b>Headers par défaut</b> : Toujours ajouter <code>Content-Type: application/json</code> dans l'onglet Headers de Postman.</li>
+</ul>
+
+<hr>
+
+<h2>✅ 2. LE CYCLE DE TEST (ÉTAPE PAR ÉTAPE)</h2>
+
+<div class="step-box">
+    <h3>ÉTAPE 1 : Inscription (POST)</h3>
+    <p><b>URL</b> : <code>/auth/register</code></p>
+    <p><b>Body (JSON raw)</b> :</p>
+    <pre>{ 
+  "username": "etudiant_test", 
+  "email": "test@univ.fr", 
+  "password": "123" 
+}</pre>
+    <p><b>Vérification</b> : Le serveur doit répondre <b>201 Created</b>.</p>
+</div>
+
+<div class="step-box">
+    <h3>ÉTAPE 2 : Connexion & Token (POST)</h3>
+    <p><b>URL</b> : <code>/auth/login</code></p>
+    <p><b>Action</b> : Envoyez vos identifiants. Copiez la valeur du champ "token" reçu en retour.</p>
+    <p><b>Vérification</b> : Le serveur doit répondre <b>200 OK</b>.</p>
+</div>
+
+<div class="step-box">
+    <h3>ÉTAPE 3 : Routes Protégées (Bearer Token)</h3>
+    <p>Pour chaque requête suivante (Liker, Voir les posts, etc.) :</p>
+    <ol>
+        <li>Allez dans l'onglet <b>Authorization</b>.</li>
+        <li>Sélectionnez <b>Bearer Token</b>.</li>
+        <li>Collez votre token.</li>
+    </ol>
+</div>
+
+<hr>
+
+<h2>🎯 3. RÉFÉRENCE DES TESTS PAR PÔLE</h2>
+
+<table>
+    <tr>
+        <th>Action</th>
+        <th>Méthode</th>
+        <th>Endpoint</th>
+    </tr>
+    <tr>
+        <td>Voir le Fil d'actualité</td>
+        <td>GET</td>
+        <td><code>/posts</code></td>
+    </tr>
+    <tr>
+        <td>Ajouter un Like</td>
+        <td>POST</td>
+        <td><code>/posts/like/:id</code></td>
+    </tr>
+    <tr>
+        <td>Vérifier Notifications</td>
+        <td>GET</td>
+        <td><code>/notifications/unread-count</code></td>
+    </tr>
+    <tr>
+        <td>Rechercher un membre</td>
+        <td>GET</td>
+        <td><code>/users/search?q=abc</code></td>
+    </tr>
+</table>
+
+<div class="info">
+    <b>Note pour la soutenance</b> : Montrez que si vous enlevez le Token dans Postman, le serveur renvoie une erreur <b>401 Unauthorized</b>. C'est la preuve que votre sécurité JWT fonctionne parfaitement !
+</div>
+
+<p style="text-align: center; margin-top: 50px; font-size: 0.8em; color: #95a5a6;">Documentation générée pour le projet NOVA par Antigravity - 2026</p>
+
+</body>
+</html>
