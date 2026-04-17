@@ -130,8 +130,8 @@ export default function MessagesPage() {
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'messages' },
         (payload: any) => {
-          const updatedMsg = payload.new as Message;
-          setMessages(prev => prev.map(m => m.id === updatedMsg.id ? updatedMsg : m));
+          const updatedFields = payload.new;
+          setMessages(prev => prev.map(m => m.id === updatedFields.id ? { ...m, ...updatedFields } : m));
           fetchConversations();
         }
       )
