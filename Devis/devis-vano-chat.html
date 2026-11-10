@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Cahier des charges et devis — VANO-CHAT</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 22mm 20mm 20mm 20mm;
+    @bottom-right { content: counter(page); font-family: Roboto, Arial, sans-serif; font-size: 9pt; color: #444; } }
+  @page :first { @bottom-right { content: none; } }
+
+  :root { --gold: #b8913a; --gold-soft: #f6efe0; --ink: #1d1d1f; --line: #c9c9c9; }
+  * { box-sizing: border-box; }
+  body { font-family: Roboto, Arial, sans-serif; font-size: 10.5pt; line-height: 1.5; color: var(--ink); margin: 0; }
+  h1, h2, h3 { font-family: 'Libre Baskerville', Georgia, serif; font-weight: 700; color: #111; }
+  h1 { font-size: 22pt; margin: 0 0 14pt; }
+  h2 { font-size: 15pt; font-weight: 400; margin: 18pt 0 8pt 22pt; }
+  h3 { font-size: 12pt; font-weight: 400; margin: 14pt 0 6pt 44pt; }
+  p { margin: 0 0 8pt; }
+  ul { margin: 0 0 8pt; padding-left: 20pt; }
+  li { margin: 1pt 0; }
+  .section { break-before: page; }
+  .keep { break-inside: avoid; }
+  .note { font-size: 9.5pt; color: #555; }
+  strong { font-weight: 700; }
+
+  /* Couverture */
+  .cover { height: 247mm; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .cover img.logo { width: 52mm; height: 52mm; margin-top: 38mm; border-radius: 12mm; }
+  .cover .title { font-family: 'Libre Baskerville', serif; font-size: 28pt; font-weight: 700; margin: 16mm 0 6mm; }
+  .cover .subtitle { font-family: 'Libre Baskerville', serif; font-size: 14pt; margin-bottom: 6mm; }
+  .cover .agency { font-family: Roboto, sans-serif; font-weight: 700; font-size: 15pt; letter-spacing: .5pt; }
+  .cover .agency small { display: block; font-weight: 400; font-size: 8.5pt; letter-spacing: 1.5pt; text-transform: uppercase; color: #666; }
+  .cover .meta { margin-top: auto; align-self: flex-start; text-align: left; font-size: 9.5pt; }
+
+  /* Sommaire */
+  .toc { list-style: none; padding: 0; margin: 0; }
+  .toc li { margin: 2pt 0; }
+  .toc .l1 { font-weight: 700; margin-top: 6pt; }
+  .toc .l2 { padding-left: 18pt; }
+  .toc .l3 { padding-left: 36pt; color: #444; }
+
+  /* Tableaux */
+  table { width: 100%; border-collapse: collapse; margin: 6pt 0 12pt; font-size: 10pt; }
+  th { background: var(--gold); color: #fff; font-weight: 400; padding: 5pt 7pt; border: 1px solid var(--gold); text-align: center; }
+  td { border: 1px solid var(--line); padding: 5pt 7pt; vertical-align: top; }
+  td.c { text-align: center; } td.r { text-align: right; white-space: nowrap; }
+  .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--line); margin: 4pt 0 14pt; }
+  .twocol > div { padding: 6pt 8pt; }
+  .twocol > div + div { border-left: 1px solid var(--line); }
+  .twocol .head { background: var(--gold); color: #fff; text-align: center; padding: 4pt; }
+  .bench-title { font-weight: 700; margin: 12pt 0 2pt; }
+
+  /* Charte */
+  .swatches { display: flex; gap: 10pt; flex-wrap: wrap; margin: 6pt 0 10pt; }
+  .sw { width: 70pt; font-size: 8pt; text-align: center; }
+  .sw i { display: block; height: 38pt; border-radius: 4pt; border: 1px solid #ddd; margin-bottom: 3pt; }
+
+  /* Arborescence */
+  .tree { display: flex; flex-direction: column; align-items: center; margin: 10pt 0; }
+  .node { border: 1.5px solid var(--gold); border-radius: 4pt; padding: 4pt 9pt; background: var(--gold-soft); font-size: 9.5pt; text-align: center; }
+  .node.root { background: var(--gold); color: #fff; }
+  .vline { width: 1.5px; height: 12pt; background: var(--gold); }
+  .row { display: flex; gap: 8pt; justify-content: center; border-top: 1.5px solid var(--gold); padding-top: 12pt; position: relative; }
+  .col { display: flex; flex-direction: column; align-items: center; gap: 6pt; }
+  .sub { font-size: 8.5pt; color: #444; text-align: center; max-width: 92pt; }
+
+  /* Aperçus */
+  figure { margin: 6pt 0 12pt; break-inside: avoid; }
+  figure img { width: 100%; border: 1px solid #ccc; border-radius: 3pt; }
+  figure.mobile { display: inline-block; width: 31%; vertical-align: top; margin-right: 2%; }
+  figcaption { font-size: 8.5pt; color: #555; margin-top: 3pt; }
+  .warn { border-left: 3px solid var(--gold); background: var(--gold-soft); padding: 6pt 9pt; font-size: 9.5pt; margin-bottom: 10pt; }
+
+  /* Budget */
+  .old { text-decoration: line-through; color: var(--gold); }
+  .gold { color: var(--gold); }
+  .total-label { font-weight: 700; margin-top: 4pt; }
+  .total { border: 1px solid var(--line); padding: 7pt 9pt; text-align: right; font-weight: 700; color: var(--gold); font-size: 11.5pt; }
+  .sign { display: grid; grid-template-columns: 1fr 1fr; gap: 14pt; margin-top: 18pt; }
+  .sign > div { border: 1px solid var(--line); padding: 8pt; height: 42mm; font-size: 9.5pt; }
+</style>
+</head>
+<body>
+
+<!-- ============ COUVERTURE ============ -->
+<div class="cover">
+  <img class="logo" src="img/logo.png" alt="Logo VANO-CHAT">
+  <div class="title">Cahier des charges</div>
+  <div class="subtitle">Réseau social VANO-CHAT — conception, développement et mise en ligne</div>
+  <div class="agency">NOVA DEV<small>Agence de développement web</small></div>
+  <div class="meta">
+    Version : 0.1<br>
+    Date de la dernière mise à jour : 10 novembre 2026
+  </div>
+</div>
+
+<!-- ============ SOMMAIRE ============ -->
+<div class="section">
+  <h1>Sommaire</h1>
+  <ul class="toc">
+    <li class="l1">1. Cadre du projet</li>
+    <li class="l2">1.1. Résumé</li><li class="l2">1.2. Contexte</li><li class="l2">1.3. Enjeux et objectifs</li>
+    <li class="l2">1.4. Présentation de l’équipe</li><li class="l2">1.5. Livrables</li><li class="l2">1.6. Planning prévisionnel</li>
+    <li class="l1">2. Benchmark</li>
+    <li class="l1">3. Considérations marketing</li>
+    <li class="l2">3.1. Cible principale</li><li class="l2">3.2. International</li><li class="l2">3.3. Référencement</li><li class="l2">3.4. Charte éditoriale</li>
+    <li class="l1">4. Conception graphique</li>
+    <li class="l2">4.1. Brief créatif</li><li class="l2">4.2. Charte graphique</li><li class="l2">4.3. Images</li>
+    <li class="l1">5. Spécifications fonctionnelles</li>
+    <li class="l2">5.1. Périmètre fonctionnel</li><li class="l3">5.1.1. Front office</li><li class="l3">5.1.2. Back office</li>
+    <li class="l2">5.2. Arborescence</li><li class="l2">5.3. Aperçu des contenus</li>
+    <li class="l1">6. Spécifications techniques</li>
+    <li class="l2">6.1. Choix technologiques</li><li class="l3">6.1.1. Nom de domaine et hébergement</li><li class="l3">6.1.2. Email</li>
+    <li class="l2">6.2. Accessibilité</li><li class="l3">6.2.1. Compatibilité navigateurs</li><li class="l3">6.2.2. Types d’appareils</li>
+    <li class="l2">6.3. Services tiers</li><li class="l2">6.4. Sécurité</li><li class="l2">6.5. Maintenance et évolutions</li>
+    <li class="l1">7. Budget</li>
+    <li class="l2">7.1. Estimation COCOMO</li><li class="l2">7.2. Détail du budget</li>
+  </ul>
+</div>
+
+<!-- ============ 1. CADRE ============ -->
+<div class="section">
+  <h1>1. Cadre du projet</h1>
+  <h2>1.1. Résumé du projet</h2>
+  <p>Le porteur du projet VANO-CHAT a exprimé les besoins suivants :</p>
+  <ul>
+    <li>offrir un réseau social moderne pour partager photos, vidéos et moments du quotidien</li>
+    <li>permettre aux membres de discuter en privé et de suivre l’activité de leurs proches</li>
+    <li>proposer une inscription simple, en un clic avec un compte Google</li>
+  </ul>
+  <p><strong>Pitch d’ascenseur de la solution :</strong><br>
+  Pour les jeunes et les étudiants qui veulent partager leur quotidien avec leurs ami(e)s proches, VANO-CHAT réunit dans une seule application le fil d’actualité, les stories, les vidéos courtes et la messagerie privée, avec une interface légère et rapide, même sur une connexion mobile modeste.</p>
+
+  <h2>1.2. Contexte</h2>
+  <p>VANO-CHAT est développé par l’équipe NOVA dans le cadre du module API REST. Le projet dispose déjà d’une première version fonctionnelle :</p>
+  <ul>
+    <li>une interface web (Next.js) : fil d’actualité, stories, explorer et reels, profils, messagerie</li>
+    <li>une API REST sécurisée (Node.js / Express) de 37 routes</li>
+    <li>une base de données PostgreSQL hébergée sur Supabase</li>
+  </ul>
+  <p>Le marché des réseaux sociaux est dominé par de très grandes plateformes. Pour exister, VANO-CHAT doit se distinguer par la proximité (un cercle d’ami(e)s proches plutôt qu’une audience de masse), la légèreté de l’application et une expérience en français pensée pour son public.</p>
+
+  <h2>1.3. Enjeux et objectifs</h2>
+  <p>L’objectif du projet est de livrer une application stable, en ligne et prête à accueillir ses premiers utilisateurs, avec un objectif de <strong>1 000 membres actifs</strong> dans les trois mois suivant la mise en ligne.</p>
+</div>
+
+<div class="section">
+  <h2>1.4. Présentation de l’équipe</h2>
+  <table>
+    <tr><th>Membre</th><th>Rôle</th><th>Responsabilités</th></tr>
+    <tr><td>Zilda</td><td>Développement backend</td><td>Cœur du serveur, base de données, authentification et sécurité</td></tr>
+    <tr><td>Kom</td><td>Développement backend</td><td>Fil d’actualité et publications</td></tr>
+    <tr><td>Marco</td><td>Développement et gestion de projet</td><td>Stories, partage, messagerie, interactions sociales, coordination</td></tr>
+    <tr><td>Nassrine</td><td>Développement frontend</td><td>Interface, design system, expérience utilisateur</td></tr>
+  </table>
+
+  <h2>1.5. Livrables</h2>
+  <p>Pour atteindre cet objectif, l’agence Nova DEV livrera les éléments suivants :</p>
+  <table>
+    <tr><th>Livrable</th><th style="width:34%">Date</th></tr>
+    <tr><td>Cahier des charges fonctionnel et technique</td><td class="c">17 novembre 2026</td></tr>
+    <tr><td>Charte graphique</td><td class="c">1 décembre 2026</td></tr>
+    <tr><td>Charte éditoriale</td><td class="c">1 décembre 2026</td></tr>
+    <tr><td>Maquettes de l’application</td><td class="c">17 décembre 2026</td></tr>
+    <tr><td>Application en ligne</td><td class="c">24 mai 2027</td></tr>
+    <tr><td>+ Formation à l’administration et à la modération</td><td class="c">31 mai 2027</td></tr>
+  </table>
+
+</div>
+
+<div class="section">
+  <h2>1.6. Planning prévisionnel</h2>
+  <p>La durée totale de 6,4 mois découle de l’estimation COCOMO (voir section 7.1), répartie selon les proportions du modèle pour un projet organique.</p>
+  <table>
+    <tr><th>Période</th><th>Phase COCOMO</th><th>Étapes</th></tr>
+    <tr><td class="c">10 nov. – 17 déc. 2026</td><td>Conception (19 %)</td><td>Cahier des charges, charte graphique et éditoriale, maquettes, organisation de la base de données</td></tr>
+    <tr><td class="c">18 déc. 2026 – 19 avr. 2027</td><td>Programmation (63 %)</td><td>Développement du serveur et de l’interface, connexion Google, traduction</td></tr>
+    <tr><td class="c">20 avr. – 24 mai 2027</td><td>Intégration et tests (18 %)</td><td>Tests complets, corrections, mise en ligne</td></tr>
+    <tr><td class="c">25 – 31 mai 2027</td><td>Mise en service</td><td>Formation et passage en maintenance</td></tr>
+  </table>
+</div>
+
+<!-- ============ 2. BENCHMARK ============ -->
+<div class="section">
+  <h1>2. Benchmark</h1>
+  <div class="keep"><div class="bench-title">Instagram ➡ www.instagram.com</div>
+  <div class="twocol"><div class="head">Points forts</div><div class="head">Points faibles</div>
+    <div><ul><li>Esthétique du fil et des profils</li><li>Stories</li><li>Reels</li></ul></div>
+    <div><ul><li>Fil saturé par les comptes inconnus et la publicité</li><li>Application lourde sur les petits forfaits</li></ul></div></div></div>
+
+  <div class="keep"><div class="bench-title">TikTok ➡ www.tiktok.com</div>
+  <div class="twocol"><div class="head">Points forts</div><div class="head">Points faibles</div>
+    <div><ul><li>Vidéos courtes en plein écran</li><li>Recommandations très efficaces</li><li>Navigation par catégories</li></ul></div>
+    <div><ul><li>Peu de lien avec les proches</li><li>Messagerie secondaire</li><li>Forte consommation de données</li></ul></div></div></div>
+
+  <div class="keep"><div class="bench-title">Facebook ➡ www.facebook.com</div>
+  <div class="twocol"><div class="head">Points forts</div><div class="head">Points faibles</div>
+    <div><ul><li>Base d’utilisateurs</li><li>Groupes et événements</li><li>Recommandations sociales</li></ul></div>
+    <div><ul><li>Interface surchargée</li><li>Image vieillissante auprès des jeunes</li><li>Messagerie dans une application séparée</li></ul></div></div></div>
+
+  <div class="keep"><div class="bench-title">WhatsApp ➡ www.whatsapp.com</div>
+  <div class="twocol"><div class="head">Points forts</div><div class="head">Points faibles</div>
+    <div><ul><li>Messagerie rapide et fiable</li><li>Statuts</li><li>Légèreté</li></ul></div>
+    <div><ul><li>Pas de fil d’actualité ni de profil public</li><li>Découverte de contenus quasi absente</li></ul></div></div></div>
+
+  <p><strong>Positionnement retenu :</strong> réunir le meilleur de ces services (fil et stories, vidéos courtes, messagerie) dans une seule application légère, centrée sur le cercle d’ami(e)s proches.</p>
+</div>
+
+<!-- ============ 3. MARKETING ============ -->
+<div class="section">
+  <h1>3. Considérations marketing</h1>
+  <h2>3.1. Cible principale</h2>
+  <table>
+    <tr><th>Caractéristiques socio-démographiques</th><th>Caractéristiques comportementales</th></tr>
+    <tr><td><ul><li>Origine : grandes villes d’Afrique francophone</li><li>Âge : 16 – 30 ans</li><li>Profil : élèves, étudiants, jeunes actifs</li><li>Équipement : smartphone Android</li><li>Budget Internet : forfaits mobiles limités</li></ul></td>
+        <td><ul><li>Archétype : étudiant(e) connecté(e)</li><li>Motivation : rester proche de son cercle, partager et être vu(e)</li><li>Critères de choix : simplicité, rapidité, contenus de ses proches</li></ul></td></tr>
+  </table>
+  <p class="note">N.B. La majorité des visites se fera depuis un téléphone : la version mobile est prioritaire.</p>
+
+  <h2>3.2. International</h2>
+  <p>L’application est rédigée en français. Une version en anglais sera proposée afin de toucher le public anglophone (notamment au Cameroun, pays bilingue).</p>
+
+  <h2>3.3. Référencement</h2>
+  <p>Les pages publiques (accueil, connexion, profils publics) respectent les bonnes pratiques SEO du référentiel OPQUAST : titres et descriptions uniques, temps de chargement réduit, images optimisées, partage enrichi sur les autres réseaux.</p>
+
+  <h2>3.4. Charte éditoriale</h2>
+  <ul>
+    <li>Ton : chaleureux et direct ; vouvoiement dans les messages de l’application</li>
+    <li>Messages courts et clairs ; pas de jargon technique dans l’interface</li>
+    <li>Règles de la communauté publiées : respect, pas de contenus haineux, violents ou à caractère sexuel</li>
+  </ul>
+</div>
+
+<!-- ============ 4. GRAPHISME ============ -->
+<div class="section">
+  <h1>4. Conception graphique</h1>
+  <h2>4.1. Brief créatif</h2>
+  <p>Le graphisme de VANO-CHAT doit être moderne, sombre et lumineux à la fois : un mode sombre profond qui met en valeur les photos et les vidéos, rehaussé de dégradés vifs empruntés aux codes des stories et des vidéos courtes. Les panneaux utilisent un effet de verre dépoli (glassmorphism) pour garder une impression de légèreté.</p>
+
+  <h2>4.2. Aperçu de charte graphique</h2>
+  <p><strong>Logo :</strong></p>
+  <img src="img/logo.png" alt="Logo" style="width:28mm;border-radius:6mm;margin:2pt 0 8pt">
+  <p><strong>Palette de couleurs :</strong></p>
+  <div class="swatches">
+    <div class="sw"><i style="background:#050508"></i>Fond<br>#050508</div>
+    <div class="sw"><i style="background:#12121a"></i>Panneaux<br>#12121A</div>
+    <div class="sw"><i style="background:#f4f4f5"></i>Texte<br>#F4F4F5</div>
+    <div class="sw"><i style="background:#00f2fe"></i>Cyan<br>#00F2FE</div>
+    <div class="sw"><i style="background:#4facfe"></i>Bleu<br>#4FACFE</div>
+    <div class="sw"><i style="background:#ff007f"></i>Rose<br>#FF007F</div>
+    <div class="sw"><i style="background:linear-gradient(45deg,#f09433,#dc2743,#bc1888)"></i>Dégradé stories</div>
+  </div>
+  <p><strong>Typographie :</strong> Inter (titres et contenus)<br><strong>Design graphique :</strong> mode sombre, glassmorphism, coins arrondis</p>
+
+  <h2>4.3. Images</h2>
+  <p>Les images sont fournies par les membres eux-mêmes (photos de profil, publications, stories). Elles seront compressées et redimensionnées automatiquement afin de ne pas alourdir le chargement des pages ni consommer trop de données mobiles. Les illustrations de la page d’accueil proviennent de banques d’images libres de droits.</p>
+</div>
+
+<!-- ============ 5. FONCTIONNEL ============ -->
+<div class="section">
+  <h1>5. Spécifications fonctionnelles</h1>
+  <h2>5.1. Périmètre fonctionnel</h2>
+  <h3>5.1.1. Front office</h3>
+  <table>
+    <tr><th>Fonctionnalité</th><th>Contrainte(s) associée(s)</th></tr>
+    <tr><td>Inscription et connexion</td><td>Email et mot de passe, ou compte Google en un clic</td></tr>
+    <tr><td>Fil d’actualité</td><td>Publications des comptes suivis, chargement progressif</td></tr>
+    <tr><td>Publications</td><td>Photo et légende ; suppression réservée à l’auteur</td></tr>
+    <tr><td>J’aime, commentaires, enregistrements</td><td>Compteurs mis à jour instantanément</td></tr>
+    <tr><td>Stories</td><td>Visibles 24 h, liste des vues</td></tr>
+    <tr><td>Explorer et Reels</td><td>Vidéos courtes en plein écran, filtres par catégorie</td></tr>
+    <tr><td>Profils</td><td>Grille des publications, abonnés, abonnements, publications enregistrées et identifiées</td></tr>
+    <tr><td>Abonnements</td><td>Suivre / ne plus suivre, suggestions de comptes</td></tr>
+    <tr><td>Recherche</td><td>Recherche de membres par pseudo</td></tr>
+    <tr><td>Messagerie privée</td><td>Conversations, modification et suppression de ses messages, compteur de non-lus, partage d’une publication</td></tr>
+    <tr><td>Notifications</td><td>J’aime, commentaires, nouveaux abonnés ; compteur de non-lues</td></tr>
+    <tr><td>Changement de langue</td><td>Français / anglais, toujours accessible</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <h3>5.1.2. Back office</h3>
+  <table>
+    <tr><th>Fonctionnalité</th><th>Contrainte(s) associée(s)</th></tr>
+    <tr><td>Gestion des membres</td><td>Restrictions en fonction des rôles (administrateur, modérateur)</td></tr>
+    <tr><td>Modération des contenus</td><td>Suppression des publications et commentaires signalés</td></tr>
+    <tr><td>Statistiques</td><td>Nombre de membres, de publications et de messages en temps réel</td></tr>
+  </table>
+
+  <h2>5.2. Arborescence</h2>
+  <div class="tree keep">
+    <div class="node root">Accueil (/)</div>
+    <div class="vline"></div>
+    <div class="node">Connexion / Inscription (/login)</div>
+    <div class="vline"></div>
+    <div class="row">
+      <div class="col"><div class="node">Fil d’actualité<br>(/feed)</div><div class="sub">Stories, publications, suggestions</div></div>
+      <div class="col"><div class="node">Explorer<br>(/explore)</div><div class="sub">Reels, catégories, recherche</div></div>
+      <div class="col"><div class="node">Messages<br>(/messages)</div><div class="sub">Conversations, nouveau message</div></div>
+      <div class="col"><div class="node">Mon profil<br>(/profile)</div><div class="sub">Publications, enregistrements, identifié, modifier le profil</div></div>
+      <div class="col"><div class="node">Profil d’un membre<br>(/profile/[id])</div><div class="sub">Suivre, envoyer un message</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>5.3. Aperçu des contenus</h2>
+  <div class="warn">⚠ Les écrans suivants sont des captures de la version actuelle de l’application. Ils servent à lister et placer les éléments de chaque page ; le graphisme final sera ajusté lors de la phase de maquettes.</div>
+  <div class="keep"><h3>5.3.1. Page de connexion</h3>
+  <figure><img src="img/login-desktop.png" alt=""><figcaption>Connexion (ordinateur) : accroche, connexion par email ou Google, création de compte.</figcaption></figure></div>
+  </div>
+<div class="section">
+  <div class="keep"><h3>5.3.2. Fil d’actualité</h3>
+  <figure><img src="img/feed-desktop.png" alt=""><figcaption>Fil d’actualité (ordinateur) : barre de navigation, stories, publications, suggestions, messagerie flottante.</figcaption></figure></div>
+</div>
+
+<div class="section">
+  <h3>5.3.3. Versions mobiles</h3>
+  <figure class="mobile"><img src="img/feed-mobile.png" alt=""><figcaption>Fil d’actualité</figcaption></figure><figure class="mobile"><img src="img/explore-mobile.png" alt=""><figcaption>Explorer</figcaption></figure><figure class="mobile"><img src="img/messages-mobile.png" alt=""><figcaption>Messages</figcaption></figure>
+</div>
+
+<div class="section">
+  <div class="keep"><h3>5.3.4. Explorer et Reels</h3>
+  <figure><img src="img/reels-desktop.png" alt=""><figcaption>Vidéos courtes en plein écran, catégories (Tendances, Mode, Voyage, Tech…), j’aime, commentaires, partage.</figcaption></figure></div>
+  <div class="keep"><h3>5.3.5. Profil</h3>
+  <figure><img src="img/profile-desktop.png" alt=""><figcaption>Profil : photo, statistiques, biographie, stories à la une, onglets Publications / Enregistrements / Identifié.</figcaption></figure></div>
+</div>
+
+<div class="section">
+  <div class="keep"><h3>5.3.6. Messagerie</h3>
+  <figure><img src="img/chat-desktop.png" alt=""><figcaption>Messagerie : liste des conversations, recherche, discussion, envoi de messages et d’images.</figcaption></figure></div>
+</div>
+
+<!-- ============ 6. TECHNIQUE ============ -->
+<div class="section">
+  <h1>6. Spécifications techniques</h1>
+  <h2>6.1. Choix technologiques</h2>
+  <table>
+    <tr><th>Besoins</th><th>Contraintes</th><th>Solution</th></tr>
+    <tr><td>Application sociale riche : fil, stories, vidéos, messagerie, notifications</td><td>Rapidité, fonctionnement sur mobile, données des membres protégées</td><td>Développement sur mesure : interface Next.js, API REST Node.js / Express, base PostgreSQL (Supabase), plutôt qu’un CMS dont les extensions sociales sont limitées.</td></tr>
+  </table>
+  <p>En fonction des critères présentés dans la grille suivante, il convient d’utiliser la solution <strong>Next.js + Express + Supabase</strong> :</p>
+  <table>
+    <tr><th></th><th>Performance et temps réel (0,4)</th><th>Liberté de conception (0,3)</th><th>Expertise interne (0,3)</th><th>Score total sur 1</th></tr>
+    <tr><td><strong>Next.js + Express + Supabase</strong></td><td class="c">0,9</td><td class="c">0,9</td><td class="c">1</td><td class="c"><strong>0,93</strong></td></tr>
+    <tr><td>Firebase</td><td class="c">0,8</td><td class="c">0,6</td><td class="c">0,4</td><td class="c">0,62</td></tr>
+    <tr><td>WordPress + BuddyPress</td><td class="c">0,4</td><td class="c">0,3</td><td class="c">0,2</td><td class="c">0,31</td></tr>
+  </table>
+  <p>Afin de proposer toutes les fonctionnalités identifiées, l’application utilisera :</p>
+  <ul><li>Tailwind CSS pour l’interface</li><li>JSON Web Tokens et Bcrypt pour la sécurité des comptes</li><li>Google Identity Services pour la connexion avec Google</li><li>Supabase Storage pour les photos et vidéos</li></ul>
+
+  <h3>6.1.1. Nom de domaine et hébergement</h3>
+  <p>Le nom de domaine (par exemple www.vanochat.com, sous réserve de disponibilité) sera réservé par l’agence. L’interface sera hébergée sur Vercel, l’API sur Render et la base de données sur Supabase. Le renouvellement sera assuré par l’agence.</p>
+  <h3>6.1.2. Email</h3>
+  <p>Nous créerons 5 adresses email pour l’équipe en suivant le format suivant : prénom@vanochat.com, ainsi qu’une adresse contact@vanochat.com pour le support.</p>
+</div>
+
+<div class="section">
+  <h2>6.2. Accessibilité</h2>
+  <h3>6.2.1. Compatibilité navigateurs</h3>
+  <p>L’application sera compatible avec les navigateurs suivants :</p>
+  <ul><li>Google Chrome</li><li>Mozilla Firefox</li><li>Safari</li><li>Microsoft Edge</li><li>Opera</li></ul>
+  <h3>6.2.2. Types d’appareils</h3>
+  <p>L’application sera conçue de manière dite « responsive » pour assurer une navigation optimale sur tous les types d’appareils :</p>
+  <ul><li>Téléphones mobiles</li><li>Tablettes</li><li>Ordinateurs portables</li><li>Ordinateurs de bureau</li></ul>
+
+  <h2>6.3. Services tiers</h2>
+  <p>Connexion : Google Identity Services<br>Base de données et stockage des médias : Supabase<br>Suivi de l’audience : Vercel Analytics</p>
+
+  <h2>6.4. Sécurité</h2>
+  <ul>
+    <li>Mots de passe chiffrés (Bcrypt) ; session protégée par un jeton valable 24 h (JWT)</li>
+    <li>Connexion Google vérifiée par le serveur directement auprès de Google</li>
+    <li>Échanges chiffrés (HTTPS) ; chaque membre ne peut modifier ou supprimer que ses propres contenus</li>
+  </ul>
+  <p>L’accès aux comptes d’administration sera limité aux 4 membres de l’équipe NOVA. Une sauvegarde quotidienne de la base de données est prévue et assurée par l’agence.</p>
+
+  <h2>6.5. Maintenance et évolutions</h2>
+  <p>La maintenance de l’application sera assurée par l’agence conformément au contrat annuel de maintenance et d’assistance.</p>
+</div>
+
+<!-- ============ 7. BUDGET ============ -->
+<div class="section">
+  <h1>7. Budget</h1>
+  <h2>7.1. Estimation COCOMO</h2>
+  <p>Le coût du développement est estimé avec le modèle <strong>COCOMO intermédiaire</strong> (Boehm), en mode <strong>organique</strong> : petite équipe, technologies connues, exigences souples.</p>
+
+  <h3>Étape 1 — Taille du logiciel</h3>
+  <table>
+    <tr><th>Partie</th><th>Contenu</th><th style="width:22%">Lignes de code</th></tr>
+    <tr><td>Interface (Next.js)</td><td>Pages, composants, contexte d’authentification</td><td class="r" rowspan="2">5 040</td></tr>
+    <tr><td>Serveur (Node.js / Express)</td><td>Routes, contrôleurs, middleware, configuration</td></tr>
+    <tr><td colspan="2"><strong>Taille retenue</strong></td><td class="r"><strong>5,04 KLOC</strong></td></tr>
+  </table>
+  <p class="note">Lignes comptées dans le code source du projet, hors lignes vides, commentaires et bibliothèques de composants prêtes à l’emploi.</p>
+
+  <h3>Étape 2 — Facteurs de coût</h3>
+  <table>
+    <tr><th>Facteur</th><th>Signification</th><th style="width:16%">Niveau</th><th style="width:13%">Valeur</th></tr>
+    <tr><td>CPLX</td><td>Complexité du produit (authentification, messagerie, stories)</td><td class="c">Élevé</td><td class="c">1,15</td></tr>
+    <tr><td>VIRT</td><td>Stabilité de la plateforme (Node.js, Next.js)</td><td class="c">Bas</td><td class="c">0,87</td></tr>
+    <tr><td>TURN</td><td>Délai de réponse de l’environnement de développement</td><td class="c">Bas</td><td class="c">0,87</td></tr>
+    <tr><td>LEXP</td><td>Expérience du langage (JavaScript / TypeScript)</td><td class="c">Élevé</td><td class="c">0,95</td></tr>
+    <tr><td>MODP</td><td>Pratiques de programmation modernes (MVC, Git)</td><td class="c">Élevé</td><td class="c">0,91</td></tr>
+    <tr><td>TOOL</td><td>Outils logiciels (VS Code, Postman, GitHub)</td><td class="c">Élevé</td><td class="c">0,91</td></tr>
+    <tr><td colspan="2">Les 9 autres facteurs (RELY, DATA, TIME, STOR, ACAP, AEXP, PCAP, VEXP, SCED)</td><td class="c">Nominal</td><td class="c">1,00</td></tr>
+    <tr><td colspan="3"><strong>Facteur d’ajustement EAF</strong> = 1,15 × 0,87 × 0,87 × 0,95 × 0,91 × 0,91</td><td class="c"><strong>0,685</strong></td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <h3>Étape 3 — Effort, durée et équipe</h3>
+  <table>
+    <tr><th style="width:24%">Mesure</th><th>Formule (mode organique)</th><th style="width:30%">Résultat</th></tr>
+    <tr><td>Effort</td><td>E = 3,2 × KLOC<sup>1,05</sup> × EAF = 3,2 × 5,465 × 0,685</td><td class="r"><strong>11,97 personnes-mois</strong></td></tr>
+    <tr><td>Durée</td><td>D = 2,5 × E<sup>0,38</sup> = 2,5 × 11,97<sup>0,38</sup></td><td class="r"><strong>6,4 mois</strong></td></tr>
+    <tr><td>Équipe moyenne</td><td>N = E ÷ D = 11,97 ÷ 6,42</td><td class="r"><strong>1,9 ≈ 2 personnes</strong></td></tr>
+  </table>
+  <p class="note">À titre de comparaison, le COCOMO de base (E = 2,4 × KLOC<sup>1,05</sup>) donne 13,11 personnes-mois et 6,7 mois. Les facteurs de coût réduisent l’effort de 9 % grâce à une équipe outillée et à l’aise avec ses langages.</p>
+
+  <h3>Étape 4 — Coût du développement</h3>
+  <p>Un mois-personne COCOMO compte 152 heures. Au taux horaire de 3 000 FCFA, il coûte 152 × 3 000 = <strong>456 000 FCFA</strong>.</p>
+  <table>
+    <tr><th>Phase</th><th style="width:14%">Part de l’effort</th><th style="width:22%">Effort (personnes-mois)</th><th style="width:20%">Coût</th></tr>
+    <tr><td>Conception générale</td><td class="c">16 %</td><td class="c">1,92</td><td class="r">875 000 FCFA</td></tr>
+    <tr><td>Conception détaillée</td><td class="c">26 %</td><td class="c">3,11</td><td class="r">1 420 000 FCFA</td></tr>
+    <tr><td>Codage et tests unitaires</td><td class="c">42 %</td><td class="c">5,03</td><td class="r">2 290 000 FCFA</td></tr>
+    <tr><td>Intégration et tests</td><td class="c">16 %</td><td class="c">1,92</td><td class="r">875 000 FCFA</td></tr>
+    <tr><td><strong>Total développement</strong></td><td class="c">100 %</td><td class="c"><strong>11,97</strong></td><td class="r"><strong>5 460 000 FCFA</strong></td></tr>
+  </table>
+  <p class="note">11,97 × 456 000 = 5 458 320 FCFA, arrondi à 5 460 000 FCFA.</p>
+</div>
+
+<div class="section">
+  <h2>7.2. Détail du budget</h2>
+  <p>Le développement (estimé par COCOMO) inclut la conception, les maquettes, le serveur, l’interface et la connexion Google. Les prestations hors logiciel s’y ajoutent.</p>
+  <table>
+    <tr><th style="width:11%">Quantité</th><th>Description</th><th style="width:13%">Réduction</th><th style="width:17%">Coût</th></tr>
+    <tr><td class="c">1</td><td>Développement de l’application VANO-CHAT (interface, serveur, base de données, connexion Google), selon l’estimation COCOMO : 11,97 personnes-mois</td><td class="c">-</td><td class="r">5 460 000 FCFA</td></tr>
+    <tr><td class="c">1</td><td>Internationalisation en anglais</td><td class="c">-</td><td class="r">300 000 FCFA</td></tr>
+    <tr><td class="c">1</td><td>Mise en ligne (Vercel, Render, Supabase) et nom de domaine</td><td class="c">-</td><td class="r">150 000 FCFA</td></tr>
+    <tr><td class="c">1</td><td>Référencement</td><td class="c">-</td><td class="r">150 000 FCFA</td></tr>
+    <tr><td class="c">1</td><td>Formation à l’administration et à la modération</td><td class="c">-</td><td class="r">100 000 FCFA</td></tr>
+    <tr><td class="c">1</td><td>Contrat de maintenance et d’assistance (abonnement annuel)</td><td class="c">-</td><td class="r">400 000 FCFA</td></tr>
+    <tr><td class="c">1</td><td>Création d’emails dédiés</td><td class="c gold">100%</td><td class="r"><span class="old">60 000 FCFA</span></td></tr>
+  </table>
+  <div class="total-label">Total :</div>
+  <div class="total">6 560 000 FCFA</div>
+  <p class="note" style="margin-top:8pt">Montants hors taxes. Devis valable 30 jours à compter du 10 novembre 2026.</p>
+
+  <div class="sign keep">
+    <div><strong>Pour le client</strong><br>Nom et fonction :<br><br>Mention « Bon pour accord »<br><br>Date et signature :</div>
+    <div><strong>Pour Nova DEV</strong><br>Nom et fonction :<br><br><br><br>Date et signature :</div>
+  </div>
+</div>
+
+</body>
+</html>

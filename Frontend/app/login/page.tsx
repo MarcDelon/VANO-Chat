@@ -30,12 +30,13 @@ export default function LoginPage() {
   const [customClientId, setCustomClientId] = useState('');
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-  const ENV_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
+  const DEFAULT_GOOGLE_CLIENT_ID = '258386098237-3uaurmj07ah1kcaph93ipqsvjjeth9rp.apps.googleusercontent.com';
+  const ENV_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || DEFAULT_GOOGLE_CLIENT_ID;
 
   const handleGoogleAuth = () => {
     setError('');
 
-    // Récupérer le Client ID depuis les variables d'environnement ou le localStorage
+    // Récupérer le Client ID depuis les variables d'environnement, le fallback ou le localStorage
     const activeClientId = ENV_CLIENT_ID || customClientId || (typeof window !== 'undefined' ? localStorage.getItem('google_client_id') || '' : '');
 
     if (!activeClientId) {
@@ -68,12 +69,30 @@ export default function LoginPage() {
           }
 
           try {
-            // Envoi du jeton Google au backend NOVA : c'est le serveur qui le vérifie
-            // auprès de Google, puis connecte ou crée le compte.
+            // Récupération immédiate des informations du profil Google
+            let googleProfile: any = null;
+            try {
+              const uRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+              });
+              if (uRes.ok) {
+                googleProfile = await uRes.json();
+              }
+            } catch (uErr) {
+              console.warn("Impossible de récupérer les infos de profil Google côté client:", uErr);
+            }
+
+            // Envoi au backend NOVA pour authentifier ou créer l'utilisateur
             const backendRes = await fetch(`${API_URL}/api/auth/google`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ access_token: tokenResponse.access_token }),
+              body: JSON.stringify({
+                access_token: tokenResponse.access_token,
+                email: googleProfile?.email,
+                name: googleProfile?.name,
+                avatar_url: googleProfile?.picture,
+                google_id: googleProfile?.sub,
+              }),
             });
 
             const data = await backendRes.json();

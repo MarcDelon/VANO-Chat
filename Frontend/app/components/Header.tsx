@@ -82,7 +82,8 @@ export function Header() {
           setNotifications(data);
         }
       } catch (error) {
-        console.error("Erreur notifications:", error);
+        // Serveur injoignable (arrêté ou en redémarrage) : on réessaiera au prochain cycle
+        console.warn("Notifications indisponibles (serveur injoignable) :", (error as Error).message);
       }
     };
 
