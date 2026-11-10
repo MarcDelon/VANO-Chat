@@ -12,4 +12,3 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = (supabaseUrl && supabaseAnonKey) 
   ? createClient(supabaseUrl, supabaseAnonKey)
   : {} as any; // Trick pour ne pas bloquer la compilation
-

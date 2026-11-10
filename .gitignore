@@ -1,14 +1,20 @@
 # Node.js
 node_modules/
-npm-debug.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Next.js
 .next/
 out/
 build/
 dist/
 
-# Environnement
+# Environnement & secrets
 .env
 .env.local
+.env.*.local
 .env.development.local
 .env.test.local
 .env.production.local
@@ -16,18 +22,15 @@ dist/
 # Logs
 logs
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
 # Système
 .DS_Store
 Thumbs.db
 ~$*
 
-# Rapports temporaires (on ne garde que l'Ultime)
-Rapport_Projet_VanoChat.doc
-Rapport_Simple_VanoChat.doc
-Rapport_Technique_Final_VanoChat.doc
-Rapport_Final_VanoChat_Professionnel.doc
-Rapport_Ultime_VanoChat_Complet.doc
+# Remotion & cache
+.remotion/
+
+# Backups et builds locaux
+NOVA exemple/
+*.tsbuildinfo

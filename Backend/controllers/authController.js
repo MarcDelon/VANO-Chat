@@ -105,3 +105,67 @@ exports.login = async (req, res) => {
         res.status(500).json({ message: 'Erreur serveur lors de la connexion.' });
     }
 };
+
+
+// Connexion Google OAuth
+exports.googleAuth = async (req, res) => {
+    try {
+        const { email, name, google_id, avatar_url } = req.body;
+        if (!email) {
+            return res.status(400).json({ message: "L'adresse email est requise." });
+        }
+
+        const { data: users, error: searchError } = await db
+            .from('users')
+            .select('*')
+            .eq('email', email);
+
+        if (searchError) {
+            console.error('Erreur Supabase lors de la recherche Google:', searchError);
+            return res.status(500).json({ message: 'Erreur serveur lors de la connexion.' });
+        }
+
+        let user = users && users.length > 0 ? users[0] : null;
+
+        if (!user) {
+            const baseUsername = name ? name.toLowerCase().replace(/[^a-z0-9]/g, '') : email.split('@')[0];
+            const username = (baseUsername || 'user') + '_' + Math.floor(1000 + Math.random() * 9000);
+            const hashedPassword = await bcrypt.hash(Math.random().toString(36), 10);
+
+            const { data: newUser, error: createError } = await db
+                .from('users')
+                .insert([{
+                    email,
+                    username,
+                    full_name: name || username,
+                    password: hashedPassword,
+                    avatar_url: avatar_url || null
+                }])
+                .select()
+                .single();
+
+            if (createError) {
+                console.error('Erreur création compte Google:', createError);
+                return res.status(500).json({ message: 'Erreur lors de la création du compte.' });
+            }
+            user = newUser;
+        }
+
+        const token = jwt.sign(
+            { userId: user.id },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        delete user.password;
+        return res.status(200).json({
+            message: 'Connexion réussie.',
+            userId: user.id,
+            token,
+            user
+        });
+    } catch (error) {
+        console.error('Erreur Google Auth:', error);
+        res.status(500).json({ message: "Erreur lors de l'authentification Google." });
+    }
+};
